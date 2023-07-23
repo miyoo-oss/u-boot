@@ -430,6 +430,11 @@ config CMD_USB
 	help
 	  USB support.
 
+config CMD_BOOTLOGO
+	bool "bootlogo"
+	help
+	  bootlog support.
+
 config CMD_DFU
 	bool "dfu"
 	select USB_FUNCTION_DFU

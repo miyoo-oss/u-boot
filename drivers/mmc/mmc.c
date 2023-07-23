@@ -21,6 +21,7 @@
 #include <linux/list.h>
 #include <div64.h>
 #include "mmc_private.h"
+#include <asm/arch/mach/platform.h>
 
 static const unsigned int sd_au_size[] = {
 	0,		SZ_16K / 512,		SZ_32K / 512,
@@ -517,33 +518,39 @@ static int mmc_send_ext_csd(struct mmc *mmc, u8 *ext_csd)
 	return err;
 }
 
+extern U32 eMMC_SetExtCSD(U8 u8_AccessMode, U8 u8_ByteIdx, U8 u8_Value);
 int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
 {
-	struct mmc_cmd cmd;
-	int timeout = 1000;
-	int retries = 3;
-	int ret;
+	// struct mmc_cmd cmd;
+	// int timeout = 1000;
+	// int retries = 3;
+	// int ret;
 
-	cmd.cmdidx = MMC_CMD_SWITCH;
-	cmd.resp_type = MMC_RSP_R1b;
-	cmd.cmdarg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
-				 (index << 16) |
-				 (value << 8);
+	// cmd.cmdidx = MMC_CMD_SWITCH;
+	// cmd.resp_type = MMC_RSP_R1b;
+	// cmd.cmdarg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
+	// 			 (index << 16) |
+	// 			 (value << 8);
 
-	while (retries > 0) {
-		ret = mmc_send_cmd(mmc, &cmd, NULL);
+	// while (retries > 0) {
+	// 	ret = mmc_send_cmd(mmc, &cmd, NULL);
 
-		/* Waiting for the ready status */
-		if (!ret) {
-			ret = mmc_send_status(mmc, timeout);
-			return ret;
-		}
+	// 	/* Waiting for the ready status */
+	// 	if (!ret) {
+	// 		ret = mmc_send_status(mmc, timeout);
+	// 		return ret;
+	// 	}
 
-		retries--;
-	}
+	// 	retries--;
+	// }
 
-	return ret;
+	// return ret;
 
+#ifdef CONFIG_MS_EMMC
+	return (int)eMMC_SetExtCSD(MMC_SWITCH_MODE_WRITE_BYTE, index, value);
+#else
+	return 0;
+#endif
 }
 
 static int mmc_change_freq(struct mmc *mmc)
@@ -1679,7 +1686,7 @@ int mmc_start_init(struct mmc *mmc)
 		return err;
 #endif
 	mmc->ddr_mode = 0;
-	mmc_set_bus_width(mmc, 1);
+    mmc_set_bus_width(mmc, 1); //[0:1:2]/[1x:4x:8x]
 	mmc_set_clock(mmc, 1);
 
 	/* Reset the Card */
