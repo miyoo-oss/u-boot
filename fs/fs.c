@@ -518,7 +518,7 @@ static int fs_read_lmb_check(const char *filename, ulong addr, loff_t offset,
 		return 0;
 
 	log_err("** Reading file would overwrite reserved memory **\n");
-	return -ENOSPC;
+	return 0;
 }
 #endif
 

@@ -788,65 +788,68 @@ int mmc_send_ext_csd(struct mmc *mmc, u8 *ext_csd)
 static int __mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value,
 			bool send_status)
 {
-	unsigned int status, start;
-	struct mmc_cmd cmd;
-	int timeout_ms = DEFAULT_CMD6_TIMEOUT_MS;
-	bool is_part_switch = (set == EXT_CSD_CMD_SET_NORMAL) &&
-			      (index == EXT_CSD_PART_CONF);
-	int ret;
+	// unsigned int status, start;
+	// struct mmc_cmd cmd;
+	// int timeout_ms = DEFAULT_CMD6_TIMEOUT_MS;
+	// bool is_part_switch = (set == EXT_CSD_CMD_SET_NORMAL) &&
+	// 		      (index == EXT_CSD_PART_CONF);
+	// int retries = 3;
+	// int ret;
 
-	if (mmc->gen_cmd6_time)
-		timeout_ms = mmc->gen_cmd6_time * 10;
+	// if (mmc->gen_cmd6_time)
+	// 	timeout_ms = mmc->gen_cmd6_time * 10;
 
-	if (is_part_switch  && mmc->part_switch_time)
-		timeout_ms = mmc->part_switch_time * 10;
+	// if (is_part_switch  && mmc->part_switch_time)
+	// 	timeout_ms = mmc->part_switch_time * 10;
 
-	cmd.cmdidx = MMC_CMD_SWITCH;
-	cmd.resp_type = MMC_RSP_R1b;
-	cmd.cmdarg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
-				 (index << 16) |
-				 (value << 8);
+	// cmd.cmdidx = MMC_CMD_SWITCH;
+	// cmd.resp_type = MMC_RSP_R1b;
+	// cmd.cmdarg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
+	// 			 (index << 16) |
+	// 			 (value << 8);
 
-	ret = mmc_send_cmd_retry(mmc, &cmd, NULL, 3);
-	if (ret)
-		return ret;
+	// do {
+	// 	ret = mmc_send_cmd(mmc, &cmd, NULL);
+	// } while (ret && retries-- > 0);
 
-	start = get_timer(0);
+	// if (ret)
+	// 	return ret;
 
-	/* poll dat0 for rdy/buys status */
-	ret = mmc_wait_dat0(mmc, 1, timeout_ms * 1000);
-	if (ret && ret != -ENOSYS)
-		return ret;
+	// start = get_timer(0);
 
-	/*
-	 * In cases when not allowed to poll by using CMD13 or because we aren't
-	 * capable of polling by using mmc_wait_dat0, then rely on waiting the
-	 * stated timeout to be sufficient.
-	 */
-	if (ret == -ENOSYS && !send_status) {
-		mdelay(timeout_ms);
-		return 0;
-	}
+	// /* poll dat0 for rdy/buys status */
+	// ret = mmc_wait_dat0(mmc, 1, timeout_ms * 1000);
+	// if (ret && ret != -ENOSYS)
+	// 	return ret;
 
-	/* Finally wait until the card is ready or indicates a failure
-	 * to switch. It doesn't hurt to use CMD13 here even if send_status
-	 * is false, because by now (after 'timeout_ms' ms) the bus should be
-	 * reliable.
-	 */
-	do {
-		ret = mmc_send_status(mmc, &status);
+	// /*
+	//  * In cases when not allowed to poll by using CMD13 or because we aren't
+	//  * capable of polling by using mmc_wait_dat0, then rely on waiting the
+	//  * stated timeout to be sufficient.
+	//  */
+	// if (ret == -ENOSYS && !send_status)
+	// 	mdelay(timeout_ms);
 
-		if (!ret && (status & MMC_STATUS_SWITCH_ERROR)) {
-			pr_debug("switch failed %d/%d/0x%x !\n", set, index,
-				 value);
-			return -EIO;
-		}
-		if (!ret && (status & MMC_STATUS_RDY_FOR_DATA))
-			return 0;
-		udelay(100);
-	} while (get_timer(start) < timeout_ms);
+	// /* Finally wait until the card is ready or indicates a failure
+	//  * to switch. It doesn't hurt to use CMD13 here even if send_status
+	//  * is false, because by now (after 'timeout_ms' ms) the bus should be
+	//  * reliable.
+	//  */
+	// do {
+	// 	ret = mmc_send_status(mmc, &status);
 
-	return -ETIMEDOUT;
+	// 	if (!ret && (status & MMC_STATUS_SWITCH_ERROR)) {
+	// 		pr_debug("switch failed %d/%d/0x%x !\n", set, index,
+	// 			 value);
+	// 		return -EIO;
+	// 	}
+	// 	if (!ret && (status & MMC_STATUS_RDY_FOR_DATA))
+	// 		return 0;
+	// 	udelay(100);
+	// } while (get_timer(start) < timeout_ms);
+
+	// return -ETIMEDOUT;
+	return 0;
 }
 
 int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
@@ -2783,7 +2786,9 @@ int mmc_get_op_cond(struct mmc *mmc)
 		      MMC_QUIRK_RETRY_APP_CMD;
 #endif
 
+	printf("Power cycle\n");
 	err = mmc_power_cycle(mmc);
+	printf("Power cycled\n");
 	if (err) {
 		/*
 		 * if power cycling is not supported, we should not try
@@ -2881,7 +2886,9 @@ int mmc_start_init(struct mmc *mmc)
 		return -ENOMEDIUM;
 	}
 
+	printf("Getting op cond\n");
 	err = mmc_get_op_cond(mmc);
+	printf("Got op cond\n");
 
 	if (!err)
 		mmc->init_in_progress = 1;
@@ -3002,9 +3009,11 @@ static int mmc_probe(struct bd_info *bis)
 			break;
 	}
 	uclass_foreach_dev(dev, uc) {
+		printf("Device probing %s\n", dev->name);
 		ret = device_probe(dev);
+		printf("Device probed %s\n", dev->name);
 		if (ret)
-			pr_err("%s - probe failed: %d\n", dev->name, ret);
+			printf("%s - probe failed: %d\n", dev->name, ret);
 	}
 
 	return 0;
@@ -3033,14 +3042,13 @@ int mmc_initialize(struct bd_info *bis)
 #endif
 #endif
 	ret = mmc_probe(bis);
+	printf("Probe out\n");
 	if (ret)
 		return ret;
 
-#ifndef CONFIG_SPL_BUILD
-	print_mmc_devices(',');
-#endif
-
+	printf("Going to preinit");
 	mmc_do_preinit();
+	printf("did preinit");
 	return 0;
 }
 

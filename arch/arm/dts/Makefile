@@ -1001,7 +1001,16 @@ dtb-$(CONFIG_TARGET_DURIAN) += phytium-durian.dtb
 
 dtb-$(CONFIG_TARGET_PRESIDIO_ASIC) += ca-presidio-engboard.dtb
 
+dtb-y += mstar-infinity2m-ssd202d-miyoo-mini.dtb
+#dtb-y += mstar-infinity.dtsi
+#dtb-y += mstar-infinity2m-ssd20xd.dtsi
+#dtb-y += mstar-infinity2m-ssd202d.dtsi
+#dtb-y += mstar-infinity2m.dtb
+#dtb-y += mstar-v7.dtsi
+
 targets += $(dtb-y)
+
+
 
 # Add any required device tree compiler flags here
 DTC_FLAGS +=

@@ -148,4 +148,12 @@ config PHYS_TO_BUS
 	  your platform's Kconfig, and implement the appropriate mapping
 	  functions in your platform's support code.
 
+menuconfig MSTAR_DRIVERS
+    bool "MStar drivers"
+    default n
+    
+if MSTAR_DRIVERS
+source "drivers/mstar/Kconfig"
+endif
+
 endmenu
