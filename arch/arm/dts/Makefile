@@ -1162,8 +1162,16 @@ dtb-$(CONFIG_TARGET_IMX8MM_CL_IOT_GATE) += imx8mm-cl-iot-gate.dtb
 dtb-$(CONFIG_TARGET_IMX8MM_CL_IOT_GATE_OPTEE) += imx8mm-cl-iot-gate-optee.dtb
 
 dtb-$(CONFIG_TARGET_EA_LPC3250DEVKITV2) += lpc3250-ea3250.dtb
+dtb-y += mstar-infinity2m-ssd202d-miyoo-mini.dtb
+#dtb-y += mstar-infinity.dtsi
+#dtb-y += mstar-infinity2m-ssd20xd.dtsi
+#dtb-y += mstar-infinity2m-ssd202d.dtsi
+#dtb-y += mstar-infinity2m.dtb
+#dtb-y += mstar-v7.dtsi
 
 targets += $(dtb-y)
+
+
 
 # Add any required device tree compiler flags here
 DTC_FLAGS += -a 0x8
