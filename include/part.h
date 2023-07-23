@@ -29,6 +29,7 @@ struct block_drvr {
 #define PART_TYPE_ISO		0x03
 #define PART_TYPE_AMIGA		0x04
 #define PART_TYPE_EFI		0x05
+#define PART_TYPE_EMMC      0x06
 
 /* maximum number of partition entries supported by search */
 #define DOS_ENTRY_NUMBERS	8
@@ -258,6 +259,14 @@ static inline int blk_get_device_part_str(const char *ifname,
 #define part_get_info_ptr(x)	x
 #endif
 
+#ifdef CONFIG_EMMC_PARTITION
+/* disk/part_emmc.c */
+extern int  test_part_emmc (block_dev_desc_t *dev_desc);
+extern int  get_partition_info_emmc (block_dev_desc_t * dev_desc, int part, disk_partition_t *info);
+extern void print_part_emmc (block_dev_desc_t *dev_desc);
+extern int  add_emmc_partitions(block_dev_desc_t *dev_desc, disk_partition_t *info);
+extern int  remove_emmc_partitions(block_dev_desc_t *dev_desc, disk_partition_t *info);
+#endif
 
 struct part_driver {
 	const char *name;

@@ -898,9 +898,11 @@ u-boot-dtb.bin: u-boot-nodtb.bin dts/dt.dtb FORCE
 
 u-boot.bin: u-boot-dtb.bin FORCE
 	$(call if_changed,copy)
+	@./create_img.sh $(CONFIG_IMAGE_POSTFIX)
 else
 u-boot.bin: u-boot-nodtb.bin FORCE
 	$(call if_changed,copy)
+	@./create_img.sh $(CONFIG_IMAGE_POSTFIX)
 endif
 
 %.imx: %.bin

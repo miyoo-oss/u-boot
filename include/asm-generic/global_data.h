@@ -110,15 +110,16 @@ typedef struct global_data {
 	ulong video_top;		/* Top of video frame buffer area */
 	ulong video_bottom;		/* Bottom of video frame buffer area */
 #endif
-#ifdef CONFIG_BOOTSTAGE
-	struct bootstage_data *bootstage;	/* Bootstage information */
-	struct bootstage_data *new_bootstage;	/* Relocated bootstage info */
+
+//#if (defined(CONFIG_ARCH_CEDRIC) || defined(CONFIG_ARCH_CHICAGO) || defined(CONFIG_ARCH_INFINITY))
+#if 1
+	unsigned long xtal_clk;
+	int boot_type;
+	int board_type;
+	char panel_type;
+    char rtk_flag;
 #endif
-#ifdef CONFIG_LOG
-	int log_drop_count;		/* Number of dropped log messages */
-	int default_log_level;		/* For devices with no filters */
-	struct list_head log_head;	/* List of struct log_device */
-#endif
+
 } gd_t;
 #endif
 
