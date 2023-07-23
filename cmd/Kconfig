@@ -1052,6 +1052,11 @@ config CMD_USB
 	help
 	  USB support.
 
+config CMD_BOOTLOGO
+	bool "bootlogo"
+	help
+	  bootlog support.
+
 config CMD_USB_SDP
 	bool "sdp"
 	select USB_FUNCTION_SDP

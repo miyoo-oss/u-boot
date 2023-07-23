@@ -726,31 +726,31 @@ static int mmc_send_ext_csd(struct mmc *mmc, u8 *ext_csd)
 
 int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
 {
-	struct mmc_cmd cmd;
-	int timeout = 1000;
-	int retries = 3;
-	int ret;
+	// struct mmc_cmd cmd;
+	// int timeout = 1000;
+	// int retries = 3;
+	// int ret;
 
-	cmd.cmdidx = MMC_CMD_SWITCH;
-	cmd.resp_type = MMC_RSP_R1b;
-	cmd.cmdarg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
-				 (index << 16) |
-				 (value << 8);
+	// cmd.cmdidx = MMC_CMD_SWITCH;
+	// cmd.resp_type = MMC_RSP_R1b;
+	// cmd.cmdarg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
+	// 			 (index << 16) |
+	// 			 (value << 8);
 
-	while (retries > 0) {
-		ret = mmc_send_cmd(mmc, &cmd, NULL);
+	// while (retries > 0) {
+	// 	ret = mmc_send_cmd(mmc, &cmd, NULL);
 
-		/* Waiting for the ready status */
-		if (!ret) {
-			ret = mmc_send_status(mmc, timeout);
-			return ret;
-		}
+	// 	/* Waiting for the ready status */
+	// 	if (!ret) {
+	// 		ret = mmc_send_status(mmc, timeout);
+	// 		return ret;
+	// 	}
 
-		retries--;
-	}
+	// 	retries--;
+	// }
 
-	return ret;
-
+	// return ret;
+	return 0;
 }
 
 #if !CONFIG_IS_ENABLED(MMC_TINY)

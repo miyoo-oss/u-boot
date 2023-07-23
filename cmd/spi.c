@@ -19,7 +19,7 @@
  */
 
 #ifndef MAX_SPI_BYTES
-#   define MAX_SPI_BYTES 32	/* Maximum number of bytes we can handle */
+#   define MAX_SPI_BYTES 1920   /* Maximum number of bytes we can handle */
 #endif
 
 #ifndef CONFIG_DEFAULT_SPI_BUS
@@ -38,6 +38,7 @@ static unsigned int	mode;
 static int   		bitlen;
 static uchar 		dout[MAX_SPI_BYTES];
 static uchar 		din[MAX_SPI_BYTES];
+#define SPI_MAX_SPEED_HZ       60000000   //1000000
 
 static int do_spi_xfer(int bus, int cs)
 {
@@ -52,12 +53,12 @@ static int do_spi_xfer(int bus, int cs)
 	str = strdup(name);
 	if (!str)
 		return -ENOMEM;
-	ret = spi_get_bus_and_cs(bus, cs, 1000000, mode, "spi_generic_drv",
+	ret = spi_get_bus_and_cs(bus, cs, SPI_MAX_SPEED_HZ, mode, "spi_generic_drv",
 				 str, &dev, &slave);
 	if (ret)
 		return ret;
 #else
-	slave = spi_setup_slave(bus, cs, 1000000, mode);
+	slave = spi_setup_slave(bus, cs, SPI_MAX_SPEED_HZ, mode);
 	if (!slave) {
 		printf("Invalid device %d:%d\n", bus, cs);
 		return -EINVAL;

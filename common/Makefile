@@ -133,3 +133,64 @@ obj-$(CONFIG_CMD_LOADB) += xyzModem.o
 obj-$(CONFIG_$(SPL_TPL_)YMODEM_SUPPORT) += xyzModem.o
 
 obj-$(CONFIG_AVB_VERIFY) += avb_verify.o
+
+obj-y += cmd_mstar.o
+obj-$(CONFIG_CMD_BOOTLOGO) += cmd_bootlogo.o
+
+ifdef CONFIG_MS_GPIO
+obj-y += MsDebug.o
+obj-$(CONFIG_MS_GPIO) += MsSysUtility.o
+endif
+
+ifdef CONFIG_MS_NAND
+CFLAGS_env_nand.o  += -I$(srctree)/drivers/mstar/unfd/inc/api
+CFLAGS_env_nand.o  += -I$(srctree)/drivers/mstar/unfd/inc/common
+CFLAGS_env_nand.o  += -I$(srctree)/drivers/mstar/unfd/inc/config
+endif
+
+ifdef CONFIG_MS_SPINAND
+CFLAGS_env_nand.o  += -I$(srctree)/drivers/mstar/spinand/inc/common
+CFLAGS_env_nand.o  += -I$(srctree)/drivers/mstar/spinand/inc/config
+CFLAGS_env_nand.o  += -I$(srctree)/drivers/mstar/spinand/inc/config/$(CONFIG_SYS_CONFIG_NAME)
+CFLAGS_cmd_mstar.o  += -I$(srctree)/drivers/mstar/spinand/inc/config/$(CONFIG_SYS_CONFIG_NAME)
+CFLAGS_cmd_nand.o  += -I$(srctree)/drivers/mstar/spinand/inc/config/$(CONFIG_SYS_CONFIG_NAME)
+endif
+
+CFLAGS_cmd_mstar.o += -I$(srctree)
+CFLAGS_env_sf.o += -I$(srctree)
+
+CFLAGS_env_embedded.o := -Wa,--no-warn -DENV_CRC=$(shell tools/envcrc 2>/dev/null)
+
+ifdef CONFIG_SSTAR_IR
+CFLAGS_autoboot.o += -I$(srctree)/drivers/mstar/ir
+endif
+
+ifdef CONFIG_SSTAR_DISP
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/common
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/disp/drv/midisp/pub
+endif
+
+ifdef CONFIG_SSTAR_PNL
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/common
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/panel/drv/mipnl/pub
+endif
+
+ifdef CONFIG_SSTAR_HDMITX
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/common
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/hdmitx/drv/hdmitx/pub
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/hdmitx/drv/mihdmitx/pub
+endif
+
+ifdef CONFIG_SSTAR_JPD
+CHIP_NAME := $(subst ",,$(CONFIG_SYS_CONFIG_NAME))
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/jpd/$(CHIP_NAME)/inc
+endif
+
+ifdef CONFIG_SSTAR_RGN
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/rgn/drv/pub
+endif
+
+ifdef CONFIG_MS_PARTITION
+CFLAGS_cmd_bootlogo.o += -I$(srctree)/drivers/mstar/partition
+CFLAGS_autoboot.o += -I$(srctree)/drivers/mstar/partition
+endif

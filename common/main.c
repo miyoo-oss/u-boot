@@ -37,6 +37,7 @@ static void run_preboot_environment_command(void)
 #endif /* CONFIG_PREBOOT */
 }
 
+
 /* We come here after U-Boot is initialised and ready to process commands */
 void main_loop(void)
 {

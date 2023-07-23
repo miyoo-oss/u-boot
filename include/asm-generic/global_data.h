@@ -132,7 +132,16 @@ typedef struct global_data {
 # ifdef CONFIG_SPL
 	struct spl_handoff *spl_handoff;
 # endif
+
+//#if (defined(CONFIG_ARCH_CEDRIC) || defined(CONFIG_ARCH_CHICAGO) || defined(CONFIG_ARCH_INFINITY))
+#if 1
+	unsigned long xtal_clk;
+	int boot_type;
+	int board_type;
+	char panel_type;
+    char rtk_flag;
 #endif
+
 } gd_t;
 #endif
 

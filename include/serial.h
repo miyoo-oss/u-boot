@@ -289,5 +289,6 @@ void ns16550_serial_initialize(void);
 void pl01x_serial_initialize(void);
 void pxa_serial_initialize(void);
 void sh_serial_initialize(void);
+void ms_serial_initialize(void);
 
 #endif
