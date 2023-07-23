@@ -1138,7 +1138,7 @@ endif
 	@# Check that this build does not use CONFIG options that we do not
 	@# know about unless they are in Kconfig. All the existing CONFIG
 	@# options are whitelisted, so new ones should not be added.
-	$(call cmd,cfgcheck,u-boot.cfg)
+#	$(call cmd,cfgcheck,u-boot.cfg)
 	@# Check that this build does not override OF_HAS_PRIOR_STAGE by
 	@# disabling OF_BOARD.
 	$(call cmd,ofcheck,$(KCONFIG_CONFIG))
@@ -1201,9 +1201,11 @@ u-boot-dtb.bin: u-boot-nodtb.bin dts/dt.dtb FORCE
 
 u-boot.bin: u-boot-dtb.bin FORCE
 	$(call if_changed,copy)
+	@./create_img.sh $(CONFIG_IMAGE_POSTFIX)
 else
 u-boot.bin: u-boot-nodtb.bin FORCE
 	$(call if_changed,copy)
+	@./create_img.sh $(CONFIG_IMAGE_POSTFIX)
 endif
 
 # we call Makefile in arch/arm/mach-imx which

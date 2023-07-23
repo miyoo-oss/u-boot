@@ -115,6 +115,8 @@ obj-$(CONFIG_W1_EEPROM) += w1-eeprom/
 obj-$(CONFIG_MACH_PIC32) += ddr/microchip/
 obj-$(CONFIG_DM_HWSPINLOCK) += hwspinlock/
 obj-$(CONFIG_DM_RNG) += rng/
+obj-$(CONFIG_MSTAR_DRIVERS) += mstar/
+
 endif
 
 obj-y += soc/

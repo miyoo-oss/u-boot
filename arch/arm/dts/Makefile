@@ -1212,12 +1212,20 @@ dtb-y += imx8mp-rsb3720-a1.dtb
 endif
 
 dtb-$(CONFIG_TARGET_EA_LPC3250DEVKITV2) += lpc3250-ea3250.dtb
+dtb-y += mstar-infinity2m-ssd202d-miyoo-mini.dtb
+#dtb-y += mstar-infinity.dtsi
+#dtb-y += mstar-infinity2m-ssd20xd.dtsi
+#dtb-y += mstar-infinity2m-ssd202d.dtsi
+#dtb-y += mstar-infinity2m.dtb
+#dtb-y += mstar-v7.dtsi
 
 dtb-$(CONFIG_ARCH_QEMU) += qemu-arm.dtb qemu-arm64.dtb
 
 include $(srctree)/scripts/Makefile.dts
 
 targets += $(dtb-y)
+
+
 
 # Add any required device tree compiler flags here
 DTC_FLAGS += -a 0x8
