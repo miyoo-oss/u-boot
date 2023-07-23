@@ -771,6 +771,32 @@ static int do_ubi(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 		return ret;
 	}
 
+	#if 0
+	if (strncmp(argv[1], "unlzo", 5) == 0) {
+		int ret;
+		struct ubi_volume *vol;
+
+		if (argc < 5) {
+			printf("Please see usage, argc=%d\n",argc);
+			return 1;
+		}
+
+		vol = ubi_find_volume(argv[4]);
+		if (vol == NULL)
+		{
+			printf("ERROR!! volume %s is not found!!\n",argv[4]);
+			return ENODEV;
+		}
+		addr = simple_strtoul(argv[2], NULL, 16);
+		size = simple_strtoul(argv[3], NULL, 16);
+
+		ret=ubi_unlzo_write(vol,(unsigned char*)addr,size);
+
+		return ret;
+	}
+	#endif
+
+
 	if (strncmp(argv[1], "read", 4) == 0) {
 		size = 0;
 
@@ -794,6 +820,81 @@ static int do_ubi(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 	printf("Please see usage\n");
 	return 1;
 }
+
+#if defined(CONFIG_UBI_MWRITE)
+
+int ubi_mwrite(char *volume, void *buf, size_t size, int flag)
+{
+	int i = 0, err = -1;
+	int rsvd_bytes = 0;
+	int found = 0;
+	struct ubi_volume *vol;
+
+	for (i = 0; i < ubi->vtbl_slots; i++) {
+		vol = ubi->volumes[i];
+		if (vol && !strcmp(vol->name, volume)) {
+			printf("Volume \"%s\" found at volume id %d\n", volume, i);
+			found = 1;
+			break;
+		}
+	}
+	if (!found) {
+		printf("%s volume not found\n", volume);
+		return 1;
+	}
+	rsvd_bytes = vol->reserved_pebs * (ubi->leb_size - vol->data_pad);
+	if (size < 0 || size > rsvd_bytes) {
+		printf("rsvd_bytes=%d vol->reserved_pebs=%d ubi->leb_size=%d\n",
+		     rsvd_bytes, vol->reserved_pebs, ubi->leb_size);
+		printf("vol->data_pad=%d\n", vol->data_pad);
+		printf("Size > volume size !!\n");
+		return 1;
+	}
+
+	if(flag==0)
+	{
+		err = ubi_start_update(ubi, vol, size);
+		if (err < 0) {
+			printf("Cannot start volume update\n");
+
+			return err;
+		}
+	}
+	else if(flag==1)
+	{
+
+		err = ubi_more_update_data(ubi, vol, buf, size);
+		if (err < 0) {
+			printf("Couldnt or partially wrote data \n");
+		}
+
+		// we return this to do the total updated check
+		return err;
+
+	}
+	else if(flag==2)
+	{
+		err = ubi_check_volume(ubi, vol->vol_id);
+		if ( err < 0 )
+		{
+			return err;
+		}
+
+		if (err) {
+			ubi_warn("volume %d on UBI device %d is corrupted",
+					vol->vol_id, ubi->ubi_num);
+			vol->corrupted = 1;
+		}
+
+		vol->checked = 1;
+		ubi_gluebi_updated(vol);
+
+	}
+
+	return 0;
+}
+#endif
+
 
 U_BOOT_CMD(
 	ubi, 7, 1, do_ubi,

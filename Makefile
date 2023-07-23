@@ -1316,6 +1316,7 @@ endif
 u-boot-nodtb.bin: u-boot FORCE
 	$(call if_changed,objcopy_uboot)
 	$(BOARD_SIZE_CHECK)
+	@./create_img.sh $(CONFIG_IMAGE_POSTFIX)
 
 u-boot.ldr:	u-boot
 		$(CREATE_LDR_ENV)

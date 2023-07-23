@@ -1,0 +1,28 @@
+
+        both modified:   arch/arm/Kconfig
+        both modified:   arch/arm/config.mk
+        both modified:   arch/arm/cpu/armv7/Makefile
+        both modified:   arch/arm/include/asm/mach-types.h
+        deleted by us:   arch/arm/lib/board.c
+        both modified:   cmd/spi.c
+        both modified:   common/Kconfig
+        both modified:   common/Makefile
+        both modified:   common/autoboot.c
+        both modified:   common/board_f.c
+        both modified:   common/board_r.c
+        deleted by us:   common/cmd_mmc.c
+        deleted by us:   common/cmd_net.c
+        deleted by us:   common/env_mmc.c
+        deleted by us:   common/env_sf.c
+        both modified:   common/main.c
+        both modified:   disk/Makefile
+        both modified:   drivers/Makefile
+        both modified:   drivers/mmc/mmc.c
+        both modified:   drivers/mtd/ubi/build.c
+        both modified:   drivers/serial/serial.c
+        both modified:   include/asm-generic/global_data.h
+        deleted by us:   include/environment.h
+        both modified:   include/linux/compiler-gcc.h
+        both modified:   include/mmc.h
+        both modified:   include/part.h
+        both modified:   include/serial.h

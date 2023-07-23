@@ -344,6 +344,15 @@ struct global_data {
 	 * @arch: architecture-specific data
 	 */
 	struct arch_global_data arch;
+//#if (defined(CONFIG_ARCH_CEDRIC) || defined(CONFIG_ARCH_CHICAGO) || defined(CONFIG_ARCH_INFINITY))
+#if 1
+	unsigned long xtal_clk;
+	int boot_type;
+	int board_type;
+	char panel_type;
+    char rtk_flag;
+#endif
+
 #ifdef CONFIG_CONSOLE_RECORD
 	/**
 	 * @console_out: output buffer for console recording

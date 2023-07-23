@@ -10,6 +10,9 @@
 
 #ifndef _BOOTSTAGE_H
 #define _BOOTSTAGE_H
+#ifdef CONFIG_SS_BOOTING_PERF
+void recode_timestamp(int mark, const char* name);
+#endif
 
 #include <linux/kconfig.h>
 
@@ -410,6 +413,9 @@ static inline ulong bootstage_error(enum bootstage_id id)
 
 static inline ulong bootstage_mark_name(enum bootstage_id id, const char *name)
 {
+#ifdef CONFIG_SS_BOOTING_PERF
+	recode_timestamp(id, name);
+#endif
 	show_boot_progress(id);
 	return 0;
 }

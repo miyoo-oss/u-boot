@@ -92,9 +92,10 @@ static int init_func_watchdog_init(void)
 	defined(CONFIG_SH) || \
 	defined(CONFIG_DESIGNWARE_WATCHDOG) || \
 	defined(CONFIG_IMX_WATCHDOG))
+
+# endif
 	hw_watchdog_init();
 	puts("       Watchdog enabled\n");
-# endif
 	schedule();
 
 	return 0;

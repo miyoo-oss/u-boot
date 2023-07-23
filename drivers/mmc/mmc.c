@@ -856,9 +856,15 @@ static int __mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value,
 	return -ETIMEDOUT;
 }
 
+extern U32 eMMC_SetExtCSD(U8 u8_AccessMode, U8 u8_ByteIdx, U8 u8_Value);
+
 int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
 {
+#ifdef CONFIG_MS_EMMC
+	return (int)eMMC_SetExtCSD(MMC_SWITCH_MODE_WRITE_BYTE, index, value);
+#else
 	return __mmc_switch(mmc, set, index, value, true);
+#endif
 }
 
 int mmc_boot_wp(struct mmc *mmc)
@@ -930,8 +936,12 @@ static int mmc_set_card_speed(struct mmc *mmc, enum bus_mode mode,
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_MS_EMMC
+	err = (int)eMMC_SetExtCSD(MMC_SWITCH_MODE_WRITE_BYTE, EXT_CSD_HS_TIMING, speed_bits);
+#else
 	err = __mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_HS_TIMING,
 			   speed_bits, !hsdowngrade);
+#endif
 	if (err)
 		return err;
 

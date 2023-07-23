@@ -124,3 +124,4 @@ obj-$(CONFIG_DM_RNG) += rng/
 endif
 
 obj-y += soc/
+obj-$(CONFIG_MSTAR_DRIVERS) += mstar/

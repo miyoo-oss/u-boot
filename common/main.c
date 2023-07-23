@@ -51,6 +51,10 @@ void main_loop(void)
 	if (IS_ENABLED(CONFIG_USE_PREBOOT))
 		run_preboot_environment_command();
 
+#ifdef CONFIG_AUTO_UPGRADE_SD
+		run_command("sdupgrade", 0);
+#endif
+
 	if (IS_ENABLED(CONFIG_UPDATE_TFTP))
 		update_tftp(0UL, NULL, NULL);
 
