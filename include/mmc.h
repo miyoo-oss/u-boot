@@ -168,7 +168,26 @@
  */
 #define EXT_CSD_ENH_START_ADDR		136	/* R/W */
 #define EXT_CSD_ENH_SIZE_MULT		140	/* R/W */
+#define EXT_CSD_ENH_START_ADDR_0     136    /* R/W */
+#define EXT_CSD_ENH_START_ADDR_1     137    /* R/W */
+#define EXT_CSD_ENH_START_ADDR_2     138    /* R/W */
+#define EXT_CSD_ENH_START_ADDR_3     139    /* R/W */
+#define EXT_CSD_ENH_SIZE_MULT_0      140    /* R/W */
+#define EXT_CSD_ENH_SIZE_MULT_1      141    /* R/W */
+#define EXT_CSD_ENH_SIZE_MULT_2      142    /* R/W */
+
 #define EXT_CSD_GP_SIZE_MULT		143	/* R/W */
+#define EXT_CSD_GP_SIZE_MULT_1_1	 144    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_1_2	 145    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_2_0	 146    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_2_1	 147    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_2_2	 148    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_3_0	 149    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_3_1	 150    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_3_2	 151    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_4_0	 152    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_4_1	 153    /* R/W */
+#define EXT_CSD_GP_SIZE_MULT_4_2	 154    /* R/W */
 #define EXT_CSD_PARTITION_SETTING	155	/* R/W */
 #define EXT_CSD_PARTITIONS_ATTRIBUTE	156	/* R/W */
 #define EXT_CSD_MAX_ENH_SIZE_MULT	157	/* R */
@@ -188,6 +207,7 @@
 #define EXT_CSD_SEC_CNT			212	/* RO, 4 bytes */
 #define EXT_CSD_HC_WP_GRP_SIZE		221	/* RO */
 #define EXT_CSD_HC_ERASE_GRP_SIZE	224	/* RO */
+#define EXT_CSD_ERASE_TIMEOUT_MULT 223 /*R*/
 #define EXT_CSD_BOOT_MULT		226	/* RO */
 #define EXT_CSD_BKOPS_SUPPORT		502	/* RO */
 
@@ -425,6 +445,7 @@ struct mmc {
 	uint dsr_imp;
 	uint scr[2];
 	uint csd[4];
+	char ext_csd[512];
 	uint cid[4];
 	ushort rca;
 	u8 part_support;
@@ -435,9 +456,12 @@ struct mmc {
 	uint read_bl_len;
 	uint write_bl_len;
 	uint erase_grp_size;	/* in 512-byte sectors */
+	int reliable_write; // 0:unsupported 1:supported but unconfigured 2:supported and configured
 	uint hc_wp_grp_size;	/* in 512-byte sectors */
 	struct sd_ssr	ssr;	/* SD status register */
 	u64 capacity;
+	u64 slc_size;
+	u64 max_slc_size;
 	u64 capacity_user;
 	u64 capacity_boot;
 	u64 capacity_rpmb;
@@ -454,6 +478,18 @@ struct mmc {
 #ifdef CONFIG_DM_MMC
 	struct udevice *dev;	/* Device for this MMC controller */
 #endif
+    //Only for sd uboot
+    const char *name;
+    int (*send_cmd)(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data);
+    void (*set_ios)(struct mmc *mmc);
+    int (*init)(struct mmc *mmc);
+    int (*getcd)(struct mmc *mmc);
+    int (*getwp)(struct mmc *mmc);
+    uint host_caps;
+    uint voltages;
+    uint f_min;
+    uint f_max;
+    uint b_max;
 };
 
 struct mmc_hwpart_conf {
@@ -532,6 +568,8 @@ int mmc_boot_partition_size_change(struct mmc *mmc, unsigned long bootsize,
 					unsigned long rpmbsize);
 /* Function to modify the PARTITION_CONFIG field of EXT_CSD */
 int mmc_set_part_conf(struct mmc *mmc, u8 ack, u8 part_num, u8 access);
+/* Function to modify the BUS_WIDTH[183] field of EXT_CSD */
+int mmc_set_normal_bus_width(struct mmc *mmc, u8 width);
 /* Function to modify the BOOT_BUS_WIDTH field of EXT_CSD */
 int mmc_set_boot_bus_width(struct mmc *mmc, u8 width, u8 reset, u8 mode);
 /* Function to modify the RST_n_FUNCTION field of EXT_CSD */

@@ -517,8 +517,13 @@ static int mmc_send_ext_csd(struct mmc *mmc, u8 *ext_csd)
 	return err;
 }
 
+extern u32 eMMC_SetExtCSD(u8 u8_AccessMode, u8 u8_ByteIdx, u8 u8_Value);
+
 int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
 {
+#ifdef CONFIG_MS_EMMC
+	return (int)eMMC_SetExtCSD(MMC_SWITCH_MODE_WRITE_BYTE, index, value);
+#else
 	struct mmc_cmd cmd;
 	int timeout = 1000;
 	int retries = 3;
@@ -543,6 +548,7 @@ int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
 	}
 
 	return ret;
+#endif
 
 }
 

@@ -75,6 +75,7 @@ machine-$(CONFIG_STM32)			+= stm32
 machine-$(CONFIG_TEGRA)			+= tegra
 machine-$(CONFIG_ARCH_UNIPHIER)		+= uniphier
 machine-$(CONFIG_ARCH_ZYNQ)		+= zynq
+machine-$(CONFIG_INFINITY2M)		+= mstar
 
 machdirs := $(patsubst %,arch/arm/mach-%/,$(machine-y))
 

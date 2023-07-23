@@ -95,4 +95,6 @@ obj-$(CONFIG_REMOTEPROC) += remoteproc/
 obj-y += thermal/
 
 obj-$(CONFIG_MACH_PIC32) += ddr/microchip/
+obj-$(CONFIG_MSTAR_DRIVERS) += mstar/
+
 endif

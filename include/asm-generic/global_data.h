@@ -107,6 +107,16 @@ typedef struct global_data {
 	ulong video_top;		/* Top of video frame buffer area */
 	ulong video_bottom;		/* Bottom of video frame buffer area */
 #endif
+
+//#if (defined(CONFIG_ARCH_CEDRIC) || defined(CONFIG_ARCH_CHICAGO) || defined(CONFIG_ARCH_INFINITY))
+#if 1
+	unsigned long xtal_clk;
+	int boot_type;
+	int board_type;
+	char panel_type;
+    char rtk_flag;
+#endif
+
 } gd_t;
 #endif
 
