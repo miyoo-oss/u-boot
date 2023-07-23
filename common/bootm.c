@@ -457,7 +457,32 @@ ulong bootm_disable_interrupts(void)
 	 * updated every 1 ms within the HCCA structure in SDRAM! For more
 	 * details see the OpenHCI specification.
 	 */
-	usb_stop();
+#if 1//defined(CONFIG_MS_USB)
+	printf("-usb_stop(USB_PORT0)\n");
+	usb_stop(USB_PORT0);
+#endif
+
+#if defined(ENABLE_SECOND_EHC)
+	printf("-usb_stop(USB_PORT1)\n");
+	usb_stop(USB_PORT1);
+#endif
+
+#if defined(ENABLE_THIRD_EHC)
+	printf("-usb_stop(USB_PORT2)\n");
+	usb_stop(USB_PORT2);
+#endif
+
+#if defined(ENABLE_FOURTH_EHC)
+	printf("-usb_stop(USB_PORT3)\n");
+	usb_stop(USB_PORT3);
+#endif
+
+#if defined(CONFIG_USB_XHCI) && defined(ENABLE_XHC)
+	printf("-usb_stop(USB_PORT4)\n");
+	usb_stop_xhci(USB_PORT4, 1); //stop and turn off power
+#endif
+
+
 #endif
 	return iflag;
 }
