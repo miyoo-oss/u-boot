@@ -177,7 +177,7 @@ static inline int spi_flash_erase(struct spi_flash *flash, u32 offset,
 
 	if (offset % mtd->erasesize || len % mtd->erasesize) {
 		printf("SF: Erase offset/length not multiple of erase size\n");
-		return -EINVAL;
+		//return -EINVAL;
 	}
 
 	if (!len)
