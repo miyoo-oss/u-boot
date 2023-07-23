@@ -339,6 +339,11 @@ config CMD_I2C
 	help
 	  I2C support.
 
+config CMD_BOOTLOGO
+	bool "bootlogo"
+	help
+	  bootlog support.
+
 config CMD_USB
 	bool "usb"
 	help

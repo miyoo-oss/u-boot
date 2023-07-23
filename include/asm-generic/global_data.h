@@ -122,6 +122,16 @@ typedef struct global_data {
 	struct membuff console_out;	/* console output */
 	struct membuff console_in;	/* console input */
 #endif
+
+//#if (defined(CONFIG_ARCH_CEDRIC) || defined(CONFIG_ARCH_CHICAGO) || defined(CONFIG_ARCH_INFINITY))
+#if 1
+	unsigned long xtal_clk;
+	int boot_type;
+	int board_type;
+	char panel_type;
+    char rtk_flag;
+#endif
+
 } gd_t;
 #endif
 

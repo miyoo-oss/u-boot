@@ -68,4 +68,6 @@ obj-y += soc/
 obj-$(CONFIG_REMOTEPROC) += remoteproc/
 obj-y += thermal/
 
+obj-$(CONFIG_MSTAR_DRIVERS) += mstar/
+
 endif
