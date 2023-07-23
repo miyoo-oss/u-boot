@@ -1,0 +1,320 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (c) 2021 thingy.jp.
+ * Author: Daniel Palmer <daniel@thingy.jp>
+ */
+
+/dts-v1/;
+#include "mstar-infinity2m-ssd202d.dtsi"
+#include <dt-bindings/input/input.h>
+
+/ {
+	model = "Miyoo Mini";
+	compatible = "miyoo,miyoo-mini", "mstar,infinity2m";
+
+	aliases {
+		serial0 = &pm_uart;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+		bootargs = "console=ttyS0,115200 clk_ignore_unused earlyprintk debug root=/dev/mmcblk0p2 ro rootfstype=squashfs rootwait";
+	};
+
+	//note: sar channel reads the system voltage which might be battery or usb
+	gpio-charger {
+		compatible = "gpio-charger";
+		charger-type = "usb-dcp";
+		gpios = <&gpio_pm SSD20XD_PM_IRIN>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys-polled";
+		poll-interval = <10>;
+
+		key_up {
+			label = "key_up";
+			gpios = <&gpio SSD20XD_GPIO_GPIO1 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_UP>; /* KEY_UP */
+		};
+
+		key_down {
+			label = "key_down";
+			gpios = <&gpio_pm SSD20XD_PM_LED0 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_DOWN>; /* KEY_DOWN */
+		};
+
+		key_left {
+			label = "key_left";
+			gpios = <&gpio_pm SSD20XD_PM_LED1 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_LEFT>; /* KEY_LEFT */
+		};
+
+		key_right {
+			label = "key_right";
+			gpios = <&gpio SSD20XD_GPIO_GPIO5 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RIGHT>; /* KEY_RIGHT */
+		};
+
+		key_a {
+			label = "key_a";
+			gpios = <&gpio SSD20XD_GPIO_GPIO7 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_A>; /* KEY_A */
+		};
+
+		key_b {
+			label = "key_b";
+			gpios = <&gpio SSD20XD_GPIO_GPIO6 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_B>; /* KEY_B */
+		};
+
+		key_y {
+			label = "key_y";
+			gpios = <&gpio SSD20XD_GPIO_GPIO8 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_Y>; /* KEY_Y */
+		};
+
+		key_x {
+			label = "key_x";
+			gpios = <&gpio SSD20XD_GPIO_GPIO9 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_X>; /* KEY_X */
+		};
+
+		key_start {
+			label = "key_start";
+			gpios = <&gpio SSD20XD_GPIO_GPIO10 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_ENTER>; /* KEY_ENTER */
+		};
+
+		key_select {
+			label = "key_select";
+			gpios = <&gpio SSD20XD_GPIO_GPIO11 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_ESC>; /* KEY_ESC */
+		};
+
+		key_menu {
+			label = "key_menu";
+			gpios = <&gpio SSD20XD_GPIO_GPIO12 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_MENU>; /* KEY_MENU */
+		};
+
+		key_l {
+			label = "key_l";
+			gpios = <&gpio SSD20XD_GPIO_GPIO14 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_L>; /* KEY_Q */
+		};
+
+		key_l2 {
+			label = "key_l2";
+			gpios = <&gpio SSD20XD_GPIO_GPIO13 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_W>; /* KEY_W */
+		};
+
+		key_r {
+			label = "key_r";
+			gpios = <&gpio SSD20XD_GPIO_UART0_RX GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_R>; /* KEY_E */
+		};
+
+		key_r2 {
+			label = "key_r2";
+			gpios = <&gpio SSD20XD_GPIO_GPIO90 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_E>; /* KEY_R */
+		};
+
+		key_power {
+			label = "key_power";
+			gpios = <&gpio SSD20XD_GPIO_GPIO86 GPIO_ACTIVE_HIGH>;
+			linux,code = <KEY_POWER>; /* KEY_POWER */
+		};
+	};
+
+	vibrator {
+		compatible = "gpio-vibrator";
+		enable-gpios = <&gpio SSD20XD_GPIO_UART0_TX GPIO_ACTIVE_LOW>;
+	};
+
+	reg_vcc_core: regulator-vcc-core {
+		compatible = "regulator-gpio";
+		regulator-name = "vcc_core";
+		regulator-type = "voltage";
+		regulator-min-microvolt = <950000>;
+		regulator-max-microvolt = <1000000>;
+		regulator-boot-on;
+		regulator-ramp-delay = <12000>;
+		gpios = <&sar 1 0>;
+		states = <1000000 0x1
+			  950000  0x0>;
+	};
+
+	reg_vcc_dram: regulator-vcc-dram {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_dram";
+		regulator-min-microvolt = <1500000>;
+		regulator-max-microvolt = <1500000>;
+		regulator-boot-on;
+	};
+
+	reg_vcc_io: regulator-vcc-io {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_io";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+	};
+
+	reg_vdd_sd: regulator-vdd-sd {
+		compatible = "regulator-fixed";
+		regulator-name = "sd_vdd";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio SSD20XD_GPIO_GPIO0 0>;
+	};
+
+	reg_vbat: regulator-vbat {
+		compatible = "regulator-fixed";
+		regulator-name = "vbat";
+		regulator-min-microvolt = <4200000>;
+		regulator-max-microvolt = <4200000>;
+		gpio = <&gpio SSD20XD_GPIO_GPIO85 0>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	//backlight: backlight {
+	//	compatible = "pwm-backlight";
+	//	pwms = <&pwm 0 50000>;
+	//	brightness-levels = <0 4 8 16 32 64 128 255>;
+	//	default-brightness-level = <6>;
+	//	pinctrl-names = "default";
+	//	pinctrl-0 = <&pwm0_mode3_pins>;
+	//};
+};
+
+&cpu0 {
+	cpu-supply = <&reg_vcc_core>;
+};
+
+&pm_uart {
+	status = "okay";
+};
+
+&i2c1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c1_mode1_pins>;
+	status = "okay";
+
+    axp22x: pmic@34 {
+        compatible = "x-powers,axp223";
+        reg = <0x34>;
+        interrupts = <GIC_SPI 37 IRQ_TYPE_LEVEL_HIGH>;
+        interrupt-controller;
+        #interrupt-cells = <1>;
+		x-powers,drive-vbus-en;
+    };
+};
+
+#include "axp223.dtsi"
+
+&usb_power_supply {
+	status = "okay";
+};
+
+&ac_power_supply {
+	status = "okay";
+};
+
+&battery_power_supply {
+	status = "okay";
+};
+
+&miu {
+	ddr-supply = <&reg_vcc_dram>;
+};
+
+&sdio {
+	vmmc-supply = <&reg_vdd_sd>;
+	vqmmc-supply = <&reg_vcc_io>;
+	status = "okay";
+};
+
+&op2 {
+	//assigned-clocks = <&clkgen MSC313_CLKGEN_MUXES SSD20XD_CLKGEN_SC_PIXEL 0>,
+	//		  <&sc_gp_ctrl_muxes SSD20XD_SC_GP_HDMI_GATE_MUX>;
+	//assigned-clock-parents = <&clkgen MSC313_CLKGEN_DIVIDERS MSC313_CLKGEN_GATE_9 GATE9_DIVIDEBY_4>;
+	//			 <&clkgen MSC313_CLKGEN_DEGLITCHES SSD20XD_CLKGEN_SC_PIXEL 0>;
+	mstar,op2-output = <1>;
+	status = "okay";
+};
+
+&op2_dsi {
+	remote-endpoint = <&dsi_in>;
+};
+
+&bach {
+	status = "okay";
+};
+
+&usbphy0 {
+	status = "okay";
+};
+
+&uhc0 {
+	status = "okay";
+};
+
+&reg_dldo1 {
+	regulator-always-on;
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+	regulator-name = "vcc-wifi-1";
+};
+
+&reg_dldo2 {
+	regulator-always-on;
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+	regulator-name = "vcc-wifi-2";
+};
+
+&usbphy2 {
+	usb0_vbus-supply = <&reg_dldo1>;
+	status = "okay";
+};
+
+&uhc2 {
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+	panel@0 {
+		compatible = "samsung,lms279cc01";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&tx_mipi_mode1_pins>;
+		//backlight = <&backlight>;
+		dsi-lanes = <4>;
+		rotation = <180>;
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
+		};
+	};
+
+	ports {
+		port@0 {
+			reg = <0>;
+			dsi_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+                };
+                port@1 {
+			reg = <1>;
+			dsi_in: endpoint {
+				remote-endpoint = <&op2_dsi>;
+			};
+		};
+        };
+};
