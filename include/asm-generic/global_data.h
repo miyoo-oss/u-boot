@@ -134,6 +134,15 @@ typedef struct global_data {
 	struct spl_handoff *spl_handoff;
 # endif
 #endif
+
+//#if (defined(CONFIG_ARCH_CEDRIC) || defined(CONFIG_ARCH_CHICAGO) || defined(CONFIG_ARCH_INFINITY))
+#if 1
+	unsigned long xtal_clk;
+	int boot_type;
+	int board_type;
+	char panel_type;
+    char rtk_flag;
+#endif
 #if defined(CONFIG_TRANSLATION_OFFSET)
 	fdt_addr_t translation_offset;	/* optional translation offset */
 #endif

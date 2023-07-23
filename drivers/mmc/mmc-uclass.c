@@ -210,8 +210,10 @@ struct mmc *mmc_get_mmc_dev(struct udevice *dev)
 {
 	struct mmc_uclass_priv *upriv;
 
-	if (!device_active(dev))
+	if (!device_active(dev)) {
+		printf("Device not active\n");
 		return NULL;
+	}
 	upriv = dev_get_uclass_priv(dev);
 	return upriv->mmc;
 }
@@ -225,9 +227,7 @@ struct mmc *find_mmc_device(int dev_num)
 	ret = blk_find_device(IF_TYPE_MMC, dev_num, &dev);
 
 	if (ret) {
-#if !defined(CONFIG_SPL_BUILD) || defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
 		printf("MMC Device %d not found\n", dev_num);
-#endif
 		return NULL;
 	}
 

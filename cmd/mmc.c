@@ -11,7 +11,11 @@
 #include <sparse_format.h>
 #include <image-sparse.h>
 
+#ifdef CONFIG_MS_EMMC
+int curr_device = -1;
+#else
 static int curr_device = -1;
+#endif
 
 static void print_mmcinfo(struct mmc *mmc)
 {
@@ -308,8 +312,8 @@ static int do_mmc_read(cmd_tbl_t *cmdtp, int flag,
 	if (!mmc)
 		return CMD_RET_FAILURE;
 
-	printf("\nMMC read: dev # %d, block # %d, count %d ... ",
-	       curr_device, blk, cnt);
+	printf("\nMMC read: dev # %d, block # %d, count %d bus_w %d... ",
+	       curr_device, blk, cnt, mmc->bus_width);
 
 	n = blk_dread(mmc_get_blk_desc(mmc), blk, cnt, addr);
 	printf("%d blocks read: %s\n", n, (n == cnt) ? "OK" : "ERROR");
@@ -401,8 +405,8 @@ static int do_mmc_write(cmd_tbl_t *cmdtp, int flag,
 	if (!mmc)
 		return CMD_RET_FAILURE;
 
-	printf("\nMMC write: dev # %d, block # %d, count %d ... ",
-	       curr_device, blk, cnt);
+	printf("\nMMC write: dev # %d, block # %d, count %d bus_w %d... ",
+	       curr_device, blk, cnt, mmc->bus_width);
 
 	if (mmc_getwp(mmc) == 1) {
 		printf("Error: card is write protected!\n");
@@ -477,7 +481,7 @@ static int do_mmc_dev(cmd_tbl_t *cmdtp, int flag,
 		      int argc, char * const argv[])
 {
 	int dev, part = 0, ret;
-	struct mmc *mmc;
+	struct mmc *mmc = 0;
 
 	if (argc == 1) {
 		dev = curr_device;
@@ -495,7 +499,9 @@ static int do_mmc_dev(cmd_tbl_t *cmdtp, int flag,
 		return CMD_RET_USAGE;
 	}
 
-	mmc = init_mmc_device(dev, true);
+    //mmc = init_mmc_device(dev, IS_SD(mmc)? true: false);
+    mmc = init_mmc_device(dev, false);
+
 	if (!mmc)
 		return CMD_RET_FAILURE;
 

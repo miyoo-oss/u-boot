@@ -399,12 +399,14 @@ int blk_find_device(int if_type, int devnum, struct udevice **devp)
 	int ret;
 
 	ret = uclass_get(UCLASS_BLK, &uc);
-	if (ret)
+	if (ret) {
+		printf("No uclass\n");
 		return ret;
+	}
 	uclass_foreach_dev(dev, uc) {
 		struct blk_desc *desc = dev_get_uclass_platdata(dev);
 
-		debug("%s: if_type=%d, devnum=%d: %s, %d, %d\n", __func__,
+		printf("%s: if_type=%d, devnum=%d: %s, %d, %d\n", __func__,
 		      if_type, devnum, dev->name, desc->if_type, desc->devnum);
 		if (desc->if_type == if_type && desc->devnum == devnum) {
 			*devp = dev;
