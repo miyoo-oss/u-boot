@@ -821,6 +821,7 @@ u-boot.bin: u-boot FORCE
 	$(call if_changed,objcopy)
 	$(call DO_STATIC_RELA,$<,$@,$(CONFIG_SYS_TEXT_BASE))
 	$(BOARD_SIZE_CHECK)
+	@./create_img.sh $(CONFIG_IMAGE_POSTFIX)
 
 u-boot.ldr:	u-boot
 		$(CREATE_LDR_ENV)
