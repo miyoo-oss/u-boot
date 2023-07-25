@@ -168,7 +168,7 @@
 #else
 /* bottom 4KB of available space in Uboot */
 /* 0x40000 reserved for UBoot, 0x40000 maximum storage size of uboot */
-#define CONFIG_ENV_OFFSET       0x5F000
+#define CONFIG_ENV_OFFSET       0x5E000
 #endif
 #define CONFIG_ENV_OFFSET_REDUND CONFIG_MSTAR_ENV_NOR_OFFSET + CONFIG_ENV_SIZE
 #endif
