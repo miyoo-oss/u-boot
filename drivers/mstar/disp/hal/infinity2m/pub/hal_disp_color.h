@@ -34,11 +34,7 @@ typedef enum
 //  Prototype
 //-------------------------------------------------------------------------------------------------
 
-#ifdef _HAL_DISP_COLOR_C_
-#define INTERFACE
-#else
 #define INTERFACE extern
-#endif
 
 INTERFACE void HalDispColorInitVar(void);
 INTERFACE void HalDispColorSeletYuvToRgbMatrix(u8 u8Id, HalDispColorYuvToRgbMatrixType_e enType, s16 *psYuv2RgbMatrix);

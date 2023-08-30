@@ -50,14 +50,49 @@
 //-------------------------------------------------------------------------------------------------
 #define PNL_TEST_MD_EN             0
 
+    //Length
+    #define LOGO_HEADER_MAGIC_PREFIX_LEN                (5)
+    #define LOGO_HEADER_OUT_BUFFER_SIZE_LEN             (5)
+    #define LOGO_HEADER_OUT_BUFFER_ADDR_LEN             (9)
+    #define LOGO_HEADER_DISPLAY_WIDTH_LEN               (3)
+    #define LOGO_HEADER_DISPLAY_HEIGHT_LEN              (3)
+    #define LOGO_HEADER_DISPLAY_RATE_LEN                (1)
+    #define LOGO_HEADER_DISPLAY_INTERFACE_LEN           (1)
+    #define LOGO_HEADER_RESERVED_LEN                    (10)
+
+#if defined(CONFIG_SSTAR_PNL)
+    #define LOGO_HEADER_PANEL_NAME_LEN                  (20)
+    #define LOGO_HEADER_PANEL_INIT_PARA_LEN             (sizeof(MhalPnlParamConfig_t))
+    #define LOGO_HEADER_PANEL_MIPI_DST_CONFIG_LEN       (sizeof(MhalPnlMipiDsiConfig_t))
+    #define LOGO_HEADER_SIZE                            (53 + LOGO_HEADER_PANEL_INIT_PARA_LEN + LOGO_HEADER_PANEL_MIPI_DST_CONFIG_LEN)
+#else
+    #define LOGO_HEADER_SIZE                            (32)
+#endif
+
+    // Offset
+    #define LOGO_HEADER_MAGIC_PREFIX_OFFSET             (0)
+    #define LOGO_HEADER_OUT_BUFFER_SIZE_OFFSET          (LOGO_HEADER_MAGIC_PREFIX_OFFSET + LOGO_HEADER_MAGIC_PREFIX_LEN)
+    #define LOGO_HEADER_OUT_BUFFER_ADDR_OFFSET          (LOGO_HEADER_OUT_BUFFER_SIZE_OFFSET + LOGO_HEADER_OUT_BUFFER_SIZE_LEN)
+    #define LOGO_HEADER_DISPLAY_WIDTH_OFFSET            (LOGO_HEADER_OUT_BUFFER_ADDR_OFFSET + LOGO_HEADER_OUT_BUFFER_ADDR_LEN)
+    #define LOGO_HEADER_DISPLAY_HEIGHT_OFFSET           (LOGO_HEADER_DISPLAY_WIDTH_OFFSET + LOGO_HEADER_DISPLAY_WIDTH_LEN)
+    #define LOGO_HEADER_DISPLAY_FPS_OFFSET              (LOGO_HEADER_DISPLAY_HEIGHT_OFFSET + LOGO_HEADER_DISPLAY_HEIGHT_LEN)
+    #define LOGO_HEADER_INTERFACE_ID_OFFSET             (LOGO_HEADER_DISPLAY_FPS_OFFSET + LOGO_HEADER_DISPLAY_RATE_LEN)
+    #define LOGO_HEADER_RESERVED_OFFSET                 (LOGO_HEADER_INTERFACE_ID_OFFSET + LOGO_HEADER_DISPLAY_INTERFACE_LEN)
+#if defined(CONFIG_SSTAR_PNL)
+    #define LOGO_HEADER_PANEL_NAME_OFFSET               (LOGO_HEADER_RESERVED_OFFSET + LOGO_HEADER_RESERVED_LEN)
+    #define LOGO_HEADER_PANEL_INIT_PARA_OFFSET          (LOGO_HEADER_PANEL_NAME_OFFSET + LOGO_HEADER_PANEL_NAME_LEN)
+    #define LOGO_HEADER_PANEL_MIPI_DST_CONFIG_OFFSET    (LOGO_HEADER_PANEL_INIT_PARA_OFFSET + LOGO_HEADER_PANEL_INIT_PARA_LEN)
+#endif
+
+
 #define BOOTLOGO_DBG_LEVEL_ERR     0x01
-#define BOOTLOGO_DBG_LEVEL_INFO    0x02
-#define BOOTLOGO_DBG_LEVEL_JPD     0x04
+#define BOOTLOGO_DBG_LEVEL_ERR    0x02
+#define BOOTLOGO_DBG_LEVEL_ERR     0x04
 
 #define FLAG_DELAY            0xFE
 #define FLAG_END_OF_TABLE     0xFF   // END OF REGISTERS MARKER
 
-#define BOOTLOGO_DBG_LEVEL          0 // BOOTLOGO_DBG_LEVEL_INFO
+#define BOOTLOGO_DBG_LEVEL          0 // BOOTLOGO_DBG_LEVEL_ERR
 
 #define BOOTLOGO_DBG(dbglv, _fmt, _args...)    \
     do                                          \
@@ -1196,7 +1231,7 @@ void _BootLogoYuv444ToYuv420(u8 *pu8InBuf, u8 *pu8OutBuf, u16 *pu16Width, u16 *p
     pu8DesY = pu8OutBuf;
     pu8DesUV = pu8DesY + (*pu16Width) * (*pu16Height);
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD,"%s %d:: 444 To 422, In:%x, Out:%x, Width:%d, Height:%d\n",
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR,"%s %d:: 444 To 422, In:%x, Out:%x, Width:%d, Height:%d\n",
         __FUNCTION__, __LINE__,
         (u32)pu8InBuf, (u32)pu8OutBuf, *pu16Width, *pu16Height);
 
@@ -1474,7 +1509,7 @@ static void _BootJpdYuvCtrl(u32 u32InBufSzie, u32 u32InBuf, u32 u32OutBufSize, u
     u32JpgSize = u32InBufSzie;
     pu8JpgBuffer = (unsigned char *)u32InBuf;
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD,"%s %d::  Create Decompress struct\n", __FUNCTION__, __LINE__);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR,"%s %d::  Create Decompress struct\n", __FUNCTION__, __LINE__);
     // Allocate a new decompress struct, with the default error handler.
     // The default error handler will exit() on pretty much any issue,
     // so it's likely you'll want to replace it or supplement it with
@@ -1482,7 +1517,7 @@ static void _BootJpdYuvCtrl(u32 u32InBufSzie, u32 u32InBuf, u32 u32OutBufSize, u
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD,"%s %d::  Set memory buffer as source\n", __FUNCTION__, __LINE__);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR,"%s %d::  Set memory buffer as source\n", __FUNCTION__, __LINE__);
     // Configure this decompressor to read its data from a memory
     // buffer starting at unsigned char *pu8JpgBuffer, which is u32JpgSize
     // long, and which must contain a complete jpg already.
@@ -1494,7 +1529,7 @@ static void _BootJpdYuvCtrl(u32 u32InBufSzie, u32 u32InBuf, u32 u32OutBufSize, u
     // managers as examples to work from.
     jpeg_mem_src(&cinfo, pu8JpgBuffer, u32JpgSize);
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD, "%s %d::  Read the JPEG header\n", __FUNCTION__, __LINE__);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d::  Read the JPEG header\n", __FUNCTION__, __LINE__);
     // Have the decompressor scan the jpeg header. This won't populate
     // the cinfo struct output fields, but will indicate if the
     // jpeg is valid.
@@ -1507,7 +1542,7 @@ static void _BootJpdYuvCtrl(u32 u32InBufSzie, u32 u32InBuf, u32 u32OutBufSize, u
     }
 
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD,"%s %d::  Initiate JPEG decompression\n", __FUNCTION__, __LINE__);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR,"%s %d::  Initiate JPEG decompression\n", __FUNCTION__, __LINE__);
 
     // output color space is yuv444 packet
     cinfo.out_color_space = JCS_YCbCr;
@@ -1518,7 +1553,7 @@ static void _BootJpdYuvCtrl(u32 u32InBufSzie, u32 u32InBuf, u32 u32OutBufSize, u
     u16Height = cinfo.output_height;
     u16PixelSize = cinfo.output_components;
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD, "%s %d::  Image is %d by %d with %d components\n",
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d::  Image is %d by %d with %d components\n",
         __FUNCTION__, __LINE__, u16Width, u16Height, u16PixelSize);
 
 
@@ -1531,7 +1566,7 @@ static void _BootJpdYuvCtrl(u32 u32InBufSzie, u32 u32InBuf, u32 u32OutBufSize, u
         return;
     }
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD, "%s %d:: BmpBuffer: 0x%x\n", __FUNCTION__, __LINE__, (u32)pu8BmpBuffer);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d:: BmpBuffer: 0x%x\n", __FUNCTION__, __LINE__, (u32)pu8BmpBuffer);
     u32Yuv420Size = u16Width * u16Height * 3 / 2;
     pu8Yuv420Buffer = (unsigned char *)(u32OutBuf + BOOTLOGO_VIRTUAL_ADDRESS_OFFSET);
 
@@ -1544,7 +1579,7 @@ static void _BootJpdYuvCtrl(u32 u32InBufSzie, u32 u32InBuf, u32 u32OutBufSize, u
 
     u16RowStride = u16Width * u16PixelSize;
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD,"%s %d:: Start reading scanlines\n", __FUNCTION__, __LINE__);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR,"%s %d:: Start reading scanlines\n", __FUNCTION__, __LINE__);
     while (cinfo.output_scanline < cinfo.output_height)
     {
         unsigned char *buffer_array[1];
@@ -1554,12 +1589,12 @@ static void _BootJpdYuvCtrl(u32 u32InBufSzie, u32 u32InBuf, u32 u32OutBufSize, u
         jpeg_read_scanlines(&cinfo, buffer_array, 1);
     }
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD,"%s %d:: Done reading scanlines\n", __FUNCTION__, __LINE__);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR,"%s %d:: Done reading scanlines\n", __FUNCTION__, __LINE__);
     jpeg_finish_decompress(&cinfo);
 
     jpeg_destroy_decompress(&cinfo);
 
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_JPD,"%s %d:: End of decompression\n", __FUNCTION__, __LINE__);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR,"%s %d:: End of decompression\n", __FUNCTION__, __LINE__);
     _BootLogoYuv444ToYuv420(pu8BmpBuffer, pu8Yuv420Buffer, &u16Width, &u16Height, eRot);
     *pu16OutWidth = u16Width;
     *pu16OutHeight = u16Height;
@@ -1575,6 +1610,7 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
 #if defined(CONFIG_SSTAR_DISP)
     SS_SHEADER_DisplayDevice_e *penDevice = NULL;
 
+    MHAL_DISP_VideoLayerAttr_t stVidLayerAttr;
     MHAL_DISP_AllocPhyMem_t stPhyMem;
     MHAL_DISP_DeviceTimingInfo_t stTimingInfo;
     static void *pDevCtx = NULL;
@@ -1654,7 +1690,7 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
             stSyncInfo.u16Hfb  = puDispPnlCfg->stPnlPara.stPnlParaCfg.u16HTotal - stSyncInfo.u16Hact - stSyncInfo.u16Hbb - stSyncInfo.u16Hpw;
             stSyncInfo.u32FrameRate = puDispPnlCfg->stPnlPara.stMipiDsiCfg.u16Fps;
     
-            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "%s %d, H(%d %d %d %d) V(%d %d %d %d) Fps:%d\n",
+            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d, H(%d %d %d %d) V(%d %d %d %d) Fps:%d\n",
                 __FUNCTION__, __LINE__,
                 stSyncInfo.u16Hfb, stSyncInfo.u16Hpw, stSyncInfo.u16Hbb, stSyncInfo.u16Hact,
                 stSyncInfo.u16Vfb, stSyncInfo.u16Vpw, stSyncInfo.u16Vbb, stSyncInfo.u16Vact,
@@ -1683,7 +1719,13 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
         u16DispOutWidht = puDispPnlCfg->stDispOut.u32Width;
         u16DispOutHeight = puDispPnlCfg->stDispOut.u32Height;
     }
-    MHAL_DISP_DeviceEnable(pDevCtx, 1);
+    MHAL_DISP_VideoLayerBind(pVidLayerCtx, pDevCtx);
+    stVidLayerAttr.stVidLayerSize.u32Width  = u16DispOutWidht;
+    stVidLayerAttr.stVidLayerSize.u32Height = u16DispOutHeight;
+    stVidLayerAttr.ePixFormat = E_MHAL_PIXEL_FRAME_ARGB8888;
+    MHAL_DISP_VideoLayerSetAttr(pVidLayerCtx, &stVidLayerAttr);
+
+
 #if !defined(CONFIG_SSTAR_RGN)
     MHAL_DISP_VideoFrameData_t stVideoFrameBuffer;
     MHAL_DISP_InputPortAttr_t stInputAttr;
@@ -1721,17 +1763,20 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
         default:
             return;
     }
-    stVideoFrameBuffer.ePixelFormat = E_MHAL_PIXEL_FRAME_YUV_MST_420;
+    stVideoFrameBuffer.ePixelFormat = E_MHAL_PIXEL_FRAME_ARGB8888;
     stVideoFrameBuffer.aPhyAddr[0] = (MS_PHYADDR)(pstDispInfo->u32DispBufStart + u32Shift);
     stVideoFrameBuffer.aPhyAddr[1] = (MS_PHYADDR)(pstDispInfo->u32DispBufStart + u32Shift + u16ImgWidth * u16ImgHeight);
     stVideoFrameBuffer.au32Stride[0] = u16ImgWidth;
     MHAL_DISP_InputPortSetAttr(pInputPortCtx, &stInputAttr);
     MHAL_DISP_InputPortFlip(pInputPortCtx, &stVideoFrameBuffer);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d, Doing Port ENABLE\n", __FUNCTION__, __LINE__);
     MHAL_DISP_InputPortEnable(pInputPortCtx, TRUE);
+    MHAL_DISP_VideoLayerEnable(pVidLayerCtx, 1);
+    MHAL_DISP_DeviceEnable(pDevCtx, 1);
 #else
     if (0 == gu32GOPorMOP)
     {
-        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
+        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
         MHAL_DISP_VideoFrameData_t stVideoFrameBuffer;
         MHAL_DISP_InputPortAttr_t stInputAttr;
 
@@ -1770,10 +1815,11 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
         }
         stVideoFrameBuffer.ePixelFormat = E_MHAL_PIXEL_FRAME_YUV_MST_420;
         stVideoFrameBuffer.aPhyAddr[0] = (MS_PHYADDR)(pstDispInfo->u32DispBufStart + u32Shift);
-        stVideoFrameBuffer.aPhyAddr[1] = (MS_PHYADDR)(pstDispInfo->u32DispBufStart + u32Shift + u16ImgWidth * u16ImgHeight);
+        //stVideoFrameBuffer.aPhyAddr[1] = (MS_PHYADDR)(pstDispInfo->u32DispBufStart + u32Shift + u16ImgWidth * u16ImgHeight);
         stVideoFrameBuffer.au32Stride[0] = u16ImgWidth;
         MHAL_DISP_InputPortSetAttr(pInputPortCtx, &stInputAttr);
         MHAL_DISP_InputPortFlip(pInputPortCtx, &stVideoFrameBuffer);
+        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d, Doing SECOND ENABLE\n", __FUNCTION__, __LINE__);
         MHAL_DISP_InputPortEnable(pInputPortCtx, TRUE);
     }
 #endif
@@ -1783,7 +1829,7 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
 
     if(u32Interface == MHAL_DISP_INTF_LCD && puDispPnlCfg->stPnlPara.au8PanelName[0] != 0)
     {
-        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "%s %d, PnlLink:%d\n",
+        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d, PnlLink:%d\n",
             __FUNCTION__, __LINE__, puDispPnlCfg->stPnlPara.stPnlParaCfg.eLinkType);
 
         if (pPnlDev == NULL)
@@ -1799,8 +1845,17 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
             
             if(puDispPnlCfg->stPnlPara.stPnlParaCfg.eLinkType == E_MHAL_PNL_LINK_MIPI_DSI)
             {
+                BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d, Configuring MIPI\n", __FUNCTION__, __LINE__);
                 MhalPnlSetMipiDsiConfig(pPnlDev, &puDispPnlCfg->stPnlPara.stMipiDsiCfg);
             }
+            MhalPnlPowerConfig_t pwrCfg;
+           
+
+            MhalPnlGetPowerConfig(pPnlDev, &pwrCfg);
+            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d, Got Power Config, %i\n", __FUNCTION__, __LINE__, pwrCfg.bEn);
+            pwrCfg.bEn = TRUE;
+
+            MhalPnlSetPowerConfig(pPnlDev, &pwrCfg);
         }
     }
 #elif defined(CONFIG_SSTAR_HDMITX)
@@ -1814,7 +1869,7 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
     {
         if(pHdmitxCtx == NULL)
         {
-            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO,  "interface %d w %d h %d clock %d\n", u32Interface, puDispPnlCfg->stDispOut.u32Width, puDispPnlCfg->stDispOut.u32Height, puDispPnlCfg->stDispOut.u32Clock);
+            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR,  "interface %d w %d h %d clock %d\n", u32Interface, puDispPnlCfg->stDispOut.u32Width, puDispPnlCfg->stDispOut.u32Height, puDispPnlCfg->stDispOut.u32Clock);
             if(MhalHdmitxCreateInstance(&pHdmitxCtx, 0) != E_MHAL_HDMITX_RET_SUCCESS)
             {
                 printf("%s %d, CreateInstance Fail\n", __FUNCTION__, __LINE__);
@@ -1863,7 +1918,7 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
         MHAL_RGN_GopWindowConfig_t stSrcWinCfg;
         MHAL_RGN_GopWindowConfig_t stDstWinCfg;
         u8 bInitRgn = 0;
-        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
+        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
 
         switch (eAspectRatio)
         {
@@ -1911,6 +1966,9 @@ void _BootDispCtrl(SS_SHEADER_DispPnl_u *puDispPnlCfg, SS_SHEADER_DispInfo_t *ps
             MHAL_RGN_GopInit();
             bInitRgn = 1;
         }
+
+        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d, Doing GOPS ENABLE\n", __FUNCTION__, __LINE__);
+
         MHAL_RGN_GopSetBaseWindow(eGopId, &stSrcWinCfg, &stDstWinCfg);
 
         MHAL_RGN_GopGwinSetPixelFormat(eGopId, eGwinId, E_MHAL_RGN_PIXEL_FORMAT_ARGB8888);
@@ -1964,7 +2022,7 @@ SS_SHEADER_DispPnl_u *_BootDbTable(SS_SHEADER_DispInfo_t *pHeadInfo, SS_SHEADER_
             }
             if (!strcmp((const char *)pDispPnl->stPnlPara.au8PanelName, pDispTable))
             {
-                BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "DB Table and setting match.\n");
+                BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "DB Table and setting match.\n");
 
                 return pDispPnl;
             }
@@ -2067,6 +2125,11 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     u8 bResorePartition = 0;
     SS_SHEADER_PictureAspectRatio_e enAspectRatio = EN_PICTURE_DISPLAY_ZOOM;
 
+    MHAL_DISP_AllocPhyMem_t stPhyMem;
+    stPhyMem.alloc = BootLogoMemAlloc;
+    stPhyMem.free  = BootLogoMemRelease;
+
+
     if (argc != 6)
     {
         BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "usage: bootlogo [logo_id] [aspect ratio '0: zoom' '1: center' '2: usr'] [x] [y] [rotation '0: none' '1: 90' '2: 180' '3: 270']\n");
@@ -2074,31 +2137,6 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
         return 0;
     }
 
-#if defined(CONFIG_CMD_MTDPARTS) || defined(CONFIG_MS_SPINAND)
-    struct mtd_device *dev;
-    struct part_info *part;
-    u8 pnum;
-    int ret;
-
-    ret = mtdparts_init();
-    if (ret)
-        return ret;
-
-    ret = find_dev_and_part(strENVName, &dev, &pnum, &part);
-    if (ret)
-    {
-        return ret;
-    }
-
-    if (dev->id->type != MTD_DEV_TYPE_NAND)
-    {
-        puts("not a NAND device\n");
-        return -1;
-    }
-
-    start = part->offset;
-    size = part->size;
-#elif defined(CONFIG_MS_PARTITION)
     mxp_record rec;
     mxp_load_table();
     idx=mxp_get_record_index(strENVName);
@@ -2115,12 +2153,8 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     }
     start = rec.start;
     size = rec.size;
-#else
-    start = 0;
-    size = 0;
-    return 0;
-#endif
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "%s in flash offset=0x%x size=0x%x\n",strENVName , start, size);
+
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s in flash offset=0x%x size=0x%x\n",strENVName , start, size);
 
     pRawData = malloc(size);
     if(pRawData == NULL)
@@ -2128,34 +2162,32 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
         BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "allocate buffer fail\n");
         return 0;
     }
-#if defined(CONFIG_CMD_MTDPARTS) || defined(CONFIG_MS_SPINAND)
-    char  cmd_str[128];
-    sprintf(cmd_str, "nand read.e 0x%p %s", pRawData, strENVName);
-    run_command(cmd_str, 0);
-#else
-    //sprintf(cmd_str, "sf probe; sf read 0x%p 0x%p 0x%p", pRawData, start, size);
-    //run_command(cmd_str, 0);
+
     memcpy(pRawData, (void*)(U32)(start | LOGO_FLAHS_BASE), size);
-#endif
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Copied Data out of logo\n");
+
     flush_cache((U32)pRawData, size);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Flushed Cache\n");
 
     pHeader = pRawData;
     //Parsing Header
     for(idx = 0; idx < 5; idx++)
     {
+        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Verifying %s %s\n", strHeaderName[idx], *((U8 *)(pHeader->au8Tittle + idx)));
         if( strHeaderName[idx] != *((U8 *)(pHeader->au8Tittle + idx)))
         {
-            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Header check fail\n");
+            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Header check fail string\n");
 
             free(pRawData);
             return 0;
         }
     }
+
     pDataHead = (SS_SHEADER_DataInfo_t *)(pRawData + sizeof(SS_HEADER_Desc_t));
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "Header count %d\n", pHeader->u32DataInfoCnt);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Header count %d\n", pHeader->u32DataInfoCnt);
     for (idx = 0; idx < pHeader->u32DataInfoCnt; idx++)
     {
-        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "Name %s Sub head sz %d total sz %d node cnt %d\n", pDataHead->au8DataInfoName, pDataHead->u32SubHeadSize,
+        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Name %s Sub head sz %d total sz %d node cnt %d\n", pDataHead->au8DataInfoName, pDataHead->u32SubHeadSize,
                                               pDataHead->u32DataTotalSize, pDataHead->u32SubNodeCount);
         if (!strcmp((char *)pDataHead->au8DataInfoName, "DISP"))
         {
@@ -2193,7 +2225,7 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
                 run_command(cmd_str, 0);
 #endif
             }
-            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "First offset %d out buf size 0x%x out buf addr 0x%x en %d\n", pDispInfo->u32FirstUseOffset, pDispInfo->u32DispBufSize, pDispInfo->u32DispBufStart, *penDevice);
+            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "First offset %d out buf size 0x%x out buf addr 0x%x en %d\n", pDispInfo->u32FirstUseOffset, pDispInfo->u32DispBufSize, pDispInfo->u32DispBufStart, *penDevice);
             switch (*penDevice)
             {
 #if defined(CONFIG_SSTAR_PNL)
@@ -2238,14 +2270,14 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     {
         gu32GOPorMOP = 1;//upgrade ui use gop
     }
-    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "CONFIG_SSTAR_RGN enable, u32LogoId:%d, gu32GOPorMOP:%d\n", u32LogoId, gu32GOPorMOP);
+    BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "CONFIG_SSTAR_RGN enable, u32LogoId:%d, gu32GOPorMOP:%d\n", u32LogoId, gu32GOPorMOP);
     #endif
     for (idx = 0; idx < pHeader->u32DataInfoCnt; idx++)
     {
         if (!strcmp((char *)pDataHead->au8DataInfoName, "LOGO"))
         {
             pstPictureInfo = (SS_SHEADER_PictureDataInfo_t *)pDataHead;
-            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "Total sz %d, Node cnt %d\n", pstPictureInfo->stDataInfo.u32DataTotalSize,
+            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Total sz %d, Node cnt %d\n", pstPictureInfo->stDataInfo.u32DataTotalSize,
                                                  pstPictureInfo->stDataInfo.u32SubNodeCount);
 
             if (u32LogoId == u32LogoCount)
@@ -2254,7 +2286,7 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
             }
             u32LogoCount++;
         }
-        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "Total size %d\n", pDataHead->u32SubHeadSize + pDataHead->u32DataTotalSize);
+        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Total size %d\n", pDataHead->u32SubHeadSize + pDataHead->u32DataTotalSize);
         pDataHead = (SS_SHEADER_DataInfo_t *)((u8 *)pDataHead + pDataHead->u32SubHeadSize + pDataHead->u32DataTotalSize);
     }
     if (idx == pHeader->u32DataInfoCnt || puDispPnl == NULL)
@@ -2267,13 +2299,13 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 #if defined(CONFIG_SSTAR_RGN)
     if (1 == gu32GOPorMOP)
     {
-        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
+        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
         _BootJpdArgbCtrl(pstPictureInfo->stDataInfo.u32DataTotalSize, (u32)((s8 *)pstPictureInfo + pstPictureInfo->stDataInfo.u32SubHeadSize),
                      pDispInfo->u32DispBufSize, pDispInfo->u32DispBufStart, &u16ImgWidth, &u16ImgHeight, (PIC_ROTATION_e)simple_strtoul(argv[5], NULL, 0));
     }
     else
     {
-        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
+        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
         _BootJpdYuvCtrl(pstPictureInfo->stDataInfo.u32DataTotalSize, (u32)((s8 *)pstPictureInfo + pstPictureInfo->stDataInfo.u32SubHeadSize),
              pDispInfo->u32DispBufSize, pDispInfo->u32DispBufStart, &u16ImgWidth, &u16ImgHeight, (PIC_ROTATION_e)simple_strtoul(argv[5], NULL, 0));
     }
@@ -2292,12 +2324,12 @@ int do_display (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 #if defined(CONFIG_SSTAR_RGN)
     if (1 == gu32GOPorMOP)
     {
-        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
+        //BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "CONFIG_SSTAR_RGN enable, func:%s, line:%d\n", __FUNCTION__,__LINE__);
         gu32FrameBuffer = pDispInfo->u32DispBufStart + 0x20000000;
         gu32DispWidth = u16ImgWidth;
         gu32DispHeight = u16ImgHeight;
         gu32Rotate = simple_strtoul(argv[5], NULL, 0);
-        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "Framebuffer addr 0x%x width %d height %d Rotate %d\n", gu32FrameBuffer, gu32DispWidth, gu32DispHeight,gu32Rotate);
+        BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "Framebuffer addr 0x%x width %d height %d Rotate %d\n", gu32FrameBuffer, gu32DispWidth, gu32DispHeight,gu32Rotate);
     }
 #endif
 
@@ -2458,7 +2490,7 @@ void do_bootfb_bar(u8 progress,char* message, u32 width, u32 height, u32 Rotate,
         }
         if (progress == 100)
         {
-            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_INFO, "%s %d,process 100 waiting:w:%d:h:%d\n",__FUNCTION__,__LINE__,offset,height * 800/1000);
+            BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "%s %d,process 100 waiting:w:%d:h:%d\n",__FUNCTION__,__LINE__,offset,height * 800/1000);
             blit32_TextProps(props,offset,height * 800/1000,str);
         }
     }

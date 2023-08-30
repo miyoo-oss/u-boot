@@ -777,6 +777,7 @@ void _HalPnlIfSetClkGetConfig(void *pCtx, void *pCfg)
 //------------------------------------------------------------------------------
 bool _HalPnlIfGetCallBack(DrvPnlCtxConfig_t *pstPnlCfg, HalPnlQueryConfig_t *pstQueryCfg)
 {
+    
     memset(&pstQueryCfg->stOutCfg, 0, sizeof(HalPnlQueryOutConfig_t));
 
     if(pstQueryCfg->stInCfg.u32CfgSize != gpPnlCbTbl[pstQueryCfg->stInCfg.enQueryType].u16CfgSize)
@@ -811,6 +812,9 @@ bool _HalPnlIfGetCallBack(DrvPnlCtxConfig_t *pstPnlCfg, HalPnlQueryConfig_t *pst
 //-------------------------------------------------------------------------------------------------
 bool HalPnlIfInit(void)
 {
+    PNL_ERR("%s %d, Iinit screen\n", __FUNCTION__, __LINE__);
+
+
     if(gbHwIfInit)
     {
         return 1;
@@ -885,6 +889,8 @@ bool HalPnlIfDeInit(void)
 bool HalPnlIfQuery(void *pCtx,  void *pCfg)
 {
     bool bRet = 1;
+
+    HalPnlIfInit();
 
     if(pCtx == NULL || pCfg == NULL)
     {
