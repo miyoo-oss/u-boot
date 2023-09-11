@@ -20,7 +20,7 @@
 #include <flash.h>
 #include <malloc.h>
 
-#include <asm/errno.h>
+#include <linux/errno.h>
 #include <linux/mtd/mtd.h>
 #include <linux/mtd/concat.h>
 //#include <mtd/cfi_flash.h>
