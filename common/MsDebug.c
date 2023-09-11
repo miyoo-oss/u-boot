@@ -121,7 +121,7 @@ static int _initDebugLevel(void)
 {
     char *pEnv=NULL;
 
-    pEnv=getenv(ENV_DEBUG_LEVLE);
+    pEnv=env_get(ENV_DEBUG_LEVLE);
     if(pEnv==NULL)
     {
         dbgLevel=DEFAULT_DEBUG_LEVEL;

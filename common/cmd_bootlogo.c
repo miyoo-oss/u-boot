@@ -1940,7 +1940,7 @@ SS_SHEADER_DispPnl_u *_BootDbTable(SS_SHEADER_DispInfo_t *pHeadInfo, SS_SHEADER_
     u32 u32Idx = 0;
     char tmp[64];
 
-    pDispTable = getenv("dispout");
+    pDispTable = env_get("dispout");
     enDevice = *(SS_SHEADER_DisplayDevice_e *)pDispPnl;
     *pbNeedRestorePartition = 0;
     switch (enDevice)
@@ -1953,9 +1953,9 @@ SS_SHEADER_DispPnl_u *_BootDbTable(SS_SHEADER_DispInfo_t *pHeadInfo, SS_SHEADER_
                 memset(tmp,0,sizeof(tmp));
                 snprintf(tmp, sizeof(tmp) - 1,"dcache off");
                 run_command(tmp, 0);
-                setenv("dispout", (const char *)pDispPnl->stPnlPara.au8PanelName);
+                env_set("dispout", (const char *)pDispPnl->stPnlPara.au8PanelName);
                 BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "dispout is empty, set %s as default.\n", pDispPnl->stPnlPara.au8PanelName);
-                env_sf_save();
+                env_save();
                 memset(tmp,0,sizeof(tmp));
                 snprintf(tmp, sizeof(tmp) - 1,"dcache on");
                 run_command(tmp, 0);
@@ -1998,9 +1998,9 @@ SS_SHEADER_DispPnl_u *_BootDbTable(SS_SHEADER_DispInfo_t *pHeadInfo, SS_SHEADER_
                 memset(tmp,0,sizeof(tmp));
                 snprintf(tmp, sizeof(tmp) - 1,"dcache off");
                 run_command(tmp, 0);
-                setenv("dispout", (const char *)pDispPnl->stDispOut.au8ResName);
+                env_set("dispout", (const char *)pDispPnl->stDispOut.au8ResName);
                 BOOTLOGO_DBG(BOOTLOGO_DBG_LEVEL_ERR, "dispout is empty, set %s as default.\n", pDispPnl->stDispOut.au8ResName);
-                env_sf_save();
+                env_save();
                 memset(tmp,0,sizeof(tmp));
                 snprintf(tmp, sizeof(tmp) - 1,"dcache on");
                 run_command(tmp, 0);

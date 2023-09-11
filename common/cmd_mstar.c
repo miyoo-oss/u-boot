@@ -154,19 +154,19 @@ int do_mstar (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     }
 
     // setenv (prelude)
-    if (IS_ARG_AVAILABLE_BOOTDELAY(argc) || getenv(ENV_BOOTDELAY) == NULL)
+    if (IS_ARG_AVAILABLE_BOOTDELAY(argc) || env_get(ENV_BOOTDELAY) == NULL)
     {
         memset(buffer, 0 , BUF_SIZE);
         sprintf(buffer, "setenv %s %s", ENV_BOOTDELAY, IS_ARG_AVAILABLE_BOOTDELAY(argc) ? ARG_BOOTDELAY(argv) : DEFAULT_BOOTDELAY);
         run_command(buffer, 0); // run_command("setenv "ENV_BOOTDELAY" "DEFAULT_BOOTDELAY, 0);
     }
-    if (IS_ARG_AVAILABLE_IPADDR(argc) || getenv(ENV_IPADDR) == NULL)
+    if (IS_ARG_AVAILABLE_IPADDR(argc) || env_get(ENV_IPADDR) == NULL)
     {
         memset(buffer, 0 , BUF_SIZE);
         sprintf(buffer, "setenv %s %s", ENV_IPADDR, IS_ARG_AVAILABLE_IPADDR(argc) ? ARG_IPADDR(argv) : DEFAULT_IPADDR);
         run_command(buffer, 0); // run_command("setenv "ENV_IPADDR" "DEFAULT_IPADDR, 0);
     }
-    if (IS_ARG_AVAILABLE_SERVERIP(argc) || getenv(ENV_SERVERIP) == NULL)
+    if (IS_ARG_AVAILABLE_SERVERIP(argc) || env_get(ENV_SERVERIP) == NULL)
     {
         memset(buffer, 0 , BUF_SIZE);
         sprintf(buffer, "setenv %s %s", ENV_SERVERIP, IS_ARG_AVAILABLE_SERVERIP(argc) ? ARG_SERVERIP(argv) : DEFAULT_SERVERIP);
@@ -218,7 +218,7 @@ int do_sdstar     (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     }
 
     memset(buffer, 0 , USBUPGRDE_SCRIPT_BUF_SIZE);
-    UpgradeImage = getenv(ENV_SD_UPGRADEIMAGE);
+    UpgradeImage = env_get(ENV_SD_UPGRADEIMAGE);
     if(UpgradeImage == NULL)
     {
         printf("UpgradeImage env is null,use default SigmastarUpgradeSD.bin\n");
@@ -604,7 +604,7 @@ int do_emmcstar     (cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
     }
 
     memset(buffer, 0 , USBUPGRDE_SCRIPT_BUF_SIZE);
-    UpgradeImage = getenv(ENV_EMMC_UPGRADEIMAGE);
+    UpgradeImage = env_set_hex(ENV_EMMC_UPGRADEIMAGE);
     if(UpgradeImage == NULL)
     {
         printf("UpgradeImage env is null,use default SigmastarUpgradeEMMC.bin\n");
@@ -829,21 +829,21 @@ extern int mxp_init_nor_flash(void);
             {
 
                 mxp_record rec;
-                setenv_hex("sf_part_start", 0);
-                setenv_hex("sf_part_size", 0);
-                setenv_hex("cpu_part_start", 0);
+                env_set_hex("sf_part_start", 0);
+                env_set_hex("sf_part_size", 0);
+                env_set_hex("cpu_part_start", 0);
 
                 if(0==mxp_get_record_by_index(idx,&rec))
                 {
                     print_mxp_record(0,&rec);
-                    setenv_hex("sf_part_start", rec.start);
-                    setenv_hex("sf_part_size", rec.size);
-                    setenv_hex("cpu_part_start", rec.start+MS_SPI_ADDR);
+                    env_set_hex("sf_part_start", rec.start);
+                    env_set_hex("sf_part_size", rec.size);
+                    env_set_hex("cpu_part_start", rec.start+MS_SPI_ADDR);
 
                     if(strncmp(argv[2], "KERNEL", 6)==0)
                     {
-                        setenv_hex("sf_kernel_start", rec.start);
-                        setenv_hex("sf_kernel_size", rec.size);
+                        env_set_hex("sf_kernel_start", rec.start);
+                        env_set_hex("sf_kernel_size", rec.size);
                     }
                 }
                 else
