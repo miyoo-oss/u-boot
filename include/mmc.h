@@ -669,7 +669,6 @@ struct mmc {
     int (*init)(struct mmc *mmc);
     int (*getcd)(struct mmc *mmc);
     int (*getwp)(struct mmc *mmc);
-    uint host_caps;
     uint voltages;
     uint f_min;
     uint f_max;

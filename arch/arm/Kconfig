@@ -1429,7 +1429,7 @@ config INFINITY6
 
 config INFINITY2M
     bool "Infinity2m platform"
-    select CPU_V7
+    select CPU_V7A
     select TARGET_INFINITY2M
 
 config INFINITY6E

@@ -55,7 +55,6 @@
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP                     /* undef to save memory     */
 #define CONFIG_SYS_CBSIZE       1024             /* Console I/O Buffer Size  */
 
 /* Print Buffer Size */
@@ -73,7 +72,6 @@
 /*
  * Physical Memory Map
  */
-#define CONFIG_NR_DRAM_BANKS	1   /* we have 1 bank of DRAM */
 #define PHYS_SDRAM_1		0x20000000	/* SDRAM Bank #1 */
 #define PHYS_SDRAM_1_SIZE	0x08000000	/* 128 MB */
 
@@ -138,7 +136,6 @@
 
 
 #define CONFIG_CMDLINE_EDITING 1
-#define CONFIG_AUTO_COMPLETE
 
 /* boot time analysis*/
 #define CONFIG_BOOT_TIME_ANALYSIS			0

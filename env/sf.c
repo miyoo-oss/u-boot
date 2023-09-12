@@ -281,7 +281,7 @@ static int env_sf_load(void)
     mxp_get_env(&env_offset, &mxp_env_size);
     if(mxp_env_size != CONFIG_ENV_SIZE * 2)
     {
-        set_default_env("mxp env size error");
+        set_default_env("mxp env size error", 0);
         return -EIO;
     }
 #elif define(CONFIG_MSTAR_ENV_OFFSET)
@@ -393,7 +393,7 @@ static int env_sf_load(void)
     mxp_get_env(&CONFIG_ENV_OFFSET, &mxp_env_size);
     if(mxp_env_size != CONFIG_ENV_SIZE)
     {
-        set_default_env("mxp env size error");
+        set_default_env("mxp env size error", 0);
         return;
     }
 #elif define(CONFIG_MSTAR_ENV_OFFSET)

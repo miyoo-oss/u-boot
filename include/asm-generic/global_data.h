@@ -132,6 +132,7 @@ typedef struct global_data {
 # ifdef CONFIG_SPL
 	struct spl_handoff *spl_handoff;
 # endif
+#endif
 
 //#if (defined(CONFIG_ARCH_CEDRIC) || defined(CONFIG_ARCH_CHICAGO) || defined(CONFIG_ARCH_INFINITY))
 #if 1
