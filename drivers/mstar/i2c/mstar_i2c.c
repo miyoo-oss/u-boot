@@ -29,6 +29,8 @@
 #include <malloc.h>
 #include "mstar_i2c.h"
 #include "mstar_i2c_reg_infinity2m.h"
+#include <dm.h>
+#include <linux/delay.h>
 
 /*=============================================================*/
 // Macro definition
@@ -40,6 +42,11 @@
 // Data type definition
 /*=============================================================*/
 
+
+/* Information about i2c controller */
+struct i2c_bus {
+    u8 port_num;
+};
 
 /*=============================================================*/
 // Variable definition
@@ -2558,7 +2565,7 @@ static int msI2CInit = false;
 /*-----------------------------------------------------------------------
  * Initialization
  */
-static void ms_i2c_init(struct i2c_adapter *adap, int speed, int slaveaddr)
+static void ms_i2c_init()
 {
     //UartSendTrace("[%s] adap->hwadapnr = %x, speed = %d, slaveaddr = %x \n", __func__, adap->hwadapnr, speed, slaveaddr);
 	if(msI2CInit == false)
@@ -2573,10 +2580,13 @@ static void ms_i2c_init(struct i2c_adapter *adap, int speed, int slaveaddr)
  * completion of EEPROM writes since the chip stops responding until
  * the write completes (typically 10mSec).
  */
-static int ms_i2c_probe(struct i2c_adapter *adap, uint8_t addr)
+static int ms_i2c_probe(struct udevice *bus, uint chip_addr,
+				uint chip_flags)
 {
+	struct i2c_bus *i2c_bus = dev_get_priv(bus);
+
     U16 u16Offset = 0x00;
-	int I2cAddr8Bit = addr << 1;
+	int I2cAddr8Bit = chip_addr << 1;
     //UartSendTrace("[%s] adap->hwadapnr = %x, addr = %x \n", __func__, adap->hwadapnr, addr);
 
 	/*
@@ -2590,7 +2600,7 @@ static int ms_i2c_probe(struct i2c_adapter *adap, uint8_t addr)
 #endif
 
     //configure port register offset ==> important
-    if(!_Hal_HWI2C_GetPortRegOffset(adap->hwadapnr, &u16Offset))
+    if(!_Hal_HWI2C_GetPortRegOffset(i2c_bus->port_num, &u16Offset))
     {
         UartSendTrace("Port index error!\n");
         return !FALSE;
@@ -2624,36 +2634,36 @@ static int ms_i2c_probe(struct i2c_adapter *adap, uint8_t addr)
 	return !TRUE;
 }
 
-static int  ms_i2c_read(struct i2c_adapter *adap, uchar chip, uint addr,
-			int alen, uchar *buffer, int len)
+static int  ms_i2c_read(struct i2c_bus *i2c_bus, uint addr, uchar *buffer, int len)
 {
-	int I2cAddr8Bit = chip << 1;
+	int I2cAddr8Bit = addr << 1;
 	int failures = 0;
     //UartSendTrace("[%s] adap->hwadapnr = %x \n", __func__, adap->hwadapnr);
 	//UartSendTrace("i2c_read: chip %02X addr %02X alen %d buffer(%p) %#x len %d\n",
 	//	chip, addr, alen, buffer, *buffer, len);
 
-	failures = HAL_HWI2C_XferRead(adap->hwadapnr,I2cAddr8Bit, addr, alen, buffer, len);
+	failures = HAL_HWI2C_XferRead(i2c_bus->port_num, I2cAddr8Bit, addr, 0, buffer, len);
 
 	return failures;
 }
 
-static int  ms_i2c_write(struct i2c_adapter *adap, uchar chip, uint addr,
-			int alen, uchar *buffer, int len)
+static int ms_i2c_write(struct i2c_bus *i2c_bus, uint addr, uchar *buffer, int len)
 {
-	int I2cAddr8Bit = chip << 1;
+	int I2cAddr8Bit = addr << 1;
 	int failures = 0;
     //UartSendTrace("[%s] adap->hwadapnr = %x \n", __func__, adap->hwadapnr);
 	//UartSendTrace("i2c_read: chip %02X addr %02X alen %d buffer(%p) %#x len %d\n",
 	//	chip, addr, alen, buffer, *buffer, len);
 
-	failures = HAL_HWI2C_XferWrite(adap->hwadapnr, I2cAddr8Bit, addr, alen, buffer, len);
+	failures = HAL_HWI2C_XferWrite(i2c_bus->port_num, I2cAddr8Bit, addr, 0, buffer, len);
 	return failures;
 }
 
-static unsigned int ms_i2c_set_bus_speed(struct i2c_adapter *adap,
-			unsigned int speed)
+static int ms_i2c_set_bus_speed(struct udevice *dev, unsigned int speed)
 {
+
+	struct i2c_bus *i2c_bus = dev_get_priv(dev);
+
     HWI2C_CLKSEL eClk;
     //UartSendTrace("[%s] adap->hwadapnr = %x, speed = %d \n", __func__, adap->hwadapnr, speed);
 
@@ -2682,22 +2692,69 @@ static unsigned int ms_i2c_set_bus_speed(struct i2c_adapter *adap,
             break;
     }
 
-    _Hal_HWI2C_SetClk(adap->hwadapnr, eClk);
+    _Hal_HWI2C_SetClk(i2c_bus->port_num, eClk);
     return 0;
 }
 
 
-/*
- * Register mstar i2c adapters
- */
-U_BOOT_I2C_ADAP_COMPLETE(ms_i2c_0, ms_i2c_init, ms_i2c_probe,
-			 ms_i2c_read, ms_i2c_write, ms_i2c_set_bus_speed,
-			 CONFIG_SYS_I2C_MS_SPEED, CONFIG_SYS_I2C_MS_SLAVE,
-			 0)
-#if defined(I2C_MS_DECLARATIONS2)
-U_BOOT_I2C_ADAP_COMPLETE(ms_i2c_1, ms_i2c_init, ms_i2c_probe,
-			 ms_i2c_read, ms_i2c_write, ms_i2c_set_bus_speed,
-			 CONFIG_SYS_I2C_MS_SPEED,
-			 CONFIG_SYS_I2C_MS_SLAVE,
-			 1)
-#endif
+
+static int mstar_i2c_probe(struct udevice *dev)
+{
+	struct i2c_bus *i2c_bus = dev_get_priv(dev);
+	int ret;
+	bool is_dvc;
+
+    i2c_bus->port_num = 1;
+
+	ms_i2c_init();
+
+	return 0;
+}
+
+static int ms_i2c_xfer(struct udevice *bus, struct i2c_msg *msg,
+			  int nmsgs)
+{
+	struct i2c_bus *i2c_bus = dev_get_priv(bus);
+	int ret;
+
+	debug("i2c_xfer: %d messages\n", nmsgs);
+	for (; nmsgs > 0; nmsgs--, msg++) {
+		bool next_is_read = nmsgs > 1 && (msg[1].flags & I2C_M_RD);
+
+		debug("i2c_xfer: chip=0x%x, len=0x%x\n", msg->addr, msg->len);
+		if (msg->flags & I2C_M_RD) {
+			ret = ms_i2c_read(i2c_bus, msg->addr, msg->buf,
+					    msg->len);
+		} else {
+			ret = ms_i2c_write(i2c_bus, msg->addr, msg->buf,
+					     msg->len);
+		}
+		if (ret) {
+			debug("i2c_write: error sending\n");
+			return -EREMOTEIO;
+		}
+	}
+
+	return 0;
+}
+
+
+static const struct dm_i2c_ops mstar_i2c_ops = {
+	.xfer		= ms_i2c_xfer,
+	.probe_chip	= ms_i2c_probe,
+	.set_bus_speed	= ms_i2c_set_bus_speed,
+};
+
+static const struct udevice_id mstar_i2c_ids[] = {
+	{ .compatible = "mstar,msc313e-i2c" },
+	{ }
+};
+
+U_BOOT_DRIVER(i2c_mstar) = {
+	.name	= "i2c_mstar",
+	.id	= UCLASS_I2C,
+	.of_match = mstar_i2c_ids,
+	.probe	= mstar_i2c_probe,
+	.priv_auto	= sizeof(struct i2c_bus),
+	.ops	= &mstar_i2c_ops,
+};
