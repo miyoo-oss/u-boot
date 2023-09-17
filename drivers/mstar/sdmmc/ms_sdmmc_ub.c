@@ -269,7 +269,7 @@ static void _SetPAD(SlotEmType eSlot, IPEmType eIP, PortEmType ePort, PADEmType 
 
 /*----------------------------------------------------------------------------------------------------------
  *
- * Function: mmc_send_cmd
+ * Function: mstar_send_cmd
  *     @author jeremy.wang (2013/7/19)
  * Desc: Request funciton for any commmand
  *
@@ -279,7 +279,7 @@ static void _SetPAD(SlotEmType eSlot, IPEmType eIP, PortEmType ePort, PADEmType 
  *
  * @return int  : 0 (pass), else (fail)
  ----------------------------------------------------------------------------------------------------------*/
-static int mmc_send_cmd(struct udevice *dev, struct mmc_cmd *cmd, struct mmc_data *data)
+static int mstar_send_cmd(struct udevice *dev, struct mmc_cmd *cmd, struct mmc_data *data)
 {
     RspStruct * eRspSt;
     RspErrEmType eErr = EV_STS_OK;
@@ -526,7 +526,7 @@ static int mstar_mmc_getcd(struct udevice *dev)
 }
 
 static const struct dm_mmc_ops ms_mmc_ops = {
-    .send_cmd   = mmc_send_cmd,
+    .send_cmd   = mstar_send_cmd,
     .set_ios    = mstar_set_ios,
     .get_cd     = mstar_mmc_getcd,
 };
@@ -534,7 +534,7 @@ static const struct dm_mmc_ops ms_mmc_ops = {
 
 static int ms_sdmmc_probe(struct udevice *dev)
 {
-	struct mstar_mmc_platdata *pdata = dev_get_platdata(dev);
+	struct mstar_mmc_platdata *pdata = dev_get_plat(dev);
 	struct mmc_uclass_priv *upriv = dev_get_uclass_priv(dev);
 	struct mmc *mmc = &pdata->mmc;
 
@@ -551,14 +551,14 @@ static int ms_sdmmc_probe(struct udevice *dev)
 #if CONFIG_IS_ENABLED(BLK)
 static int mstar_mmc_bind(struct udevice *dev)
 {
-	struct mstar_mmc_platdata *plat = dev_get_platdata(dev);
+	struct mstar_mmc_platdata *plat = dev_get_plat(dev);
 	return mmc_bind(dev, &plat->mmc, &plat->cfg);
 }
 #endif
 
 static int mstar_mmc_ofdata_to_platdata(struct udevice *dev)
 {
-	struct mstar_mmc_platdata *plat = dev_get_platdata(dev);
+	struct mstar_mmc_platdata *plat = dev_get_plat(dev);
 	struct mmc_config *cfg;
 	int ret;
 
@@ -595,12 +595,12 @@ U_BOOT_DRIVER(mstar_mmc_drv) = {
 	.name		= "mstar_mmc",
 	.id		= UCLASS_MMC,
 	.of_match	= mstar_mmc_ids,
-	.ofdata_to_platdata	= mstar_mmc_ofdata_to_platdata,
+	.of_to_plat	= mstar_mmc_ofdata_to_platdata,
 #if CONFIG_IS_ENABLED(BLK)
 	.bind		= mstar_mmc_bind,
 #endif
 	.probe		= ms_sdmmc_probe,
 	.ops		= &ms_mmc_ops,
-    .priv_auto_alloc_size = 0,
-	.platdata_auto_alloc_size	= sizeof(struct mstar_mmc_platdata),
+    .priv_auto = 0,
+	.plat_auto	= sizeof(struct mstar_mmc_platdata),
 };

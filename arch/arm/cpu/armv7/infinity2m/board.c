@@ -17,6 +17,7 @@
 */
 #include <common.h>
 #include <asm/mach-types.h>
+#include <asm/global_data.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 

@@ -27,6 +27,7 @@
 #include <config.h>
 #include <malloc.h>
 #include <watchdog.h>
+#include <linux/delay.h>
 
 //#endif
 

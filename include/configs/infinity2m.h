@@ -45,13 +45,6 @@
 
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 
-#define CONFIG_SKIP_LOWLEVEL_INIT
-
-/*
- * Size of malloc() pool
- */
-#define CONFIG_SYS_MALLOC_LEN	    (CONFIG_ENV_SIZE + 4*1024*1024)/* (CONFIG_ENV_SIZE + 512*1024) */
-
 /*
  * Miscellaneous configurable options
  */
@@ -118,9 +111,6 @@
 /* The address used to save tag list used when kernel is booting */
 #define BOOT_PARAMS 	        (RAM_START_ADDR)
 #define BOOT_PARAMS_LEN         0x2000
-
-/* CFG load address */
-#define CONFIG_SYS_LOAD_ADDR	        (BOOT_PARAMS+BOOT_PARAMS_LEN+0x4000)
 
 #define CONFIG_CMDLINE_TAG       1    /* enable passing of ATAGs */
 #define CONFIG_SETUP_MEMORY_TAGS 1
@@ -308,7 +298,6 @@
 #define CONFIG_CMD_CACHE
 
 /* EEPROM */
-#define CONFIG_CMD_EEPROM
 #define CONFIG_HARD_I2C
 #define CONFIG_SYS_I2C_EEPROM_ADDR_LEN (2)
 #define CONFIG_SYS_I2C_EEPROM_ADDR (0x54)
