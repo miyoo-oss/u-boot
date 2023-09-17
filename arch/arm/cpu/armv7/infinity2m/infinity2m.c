@@ -21,6 +21,8 @@
 #include "asm/arch/mach/ms_types.h"
 #include "asm/arch/mach/platform.h"
 #include "asm/arch/mach/io.h"
+#include <asm/global_data.h>
+
 
 #define STORAGE_SPI_NAND_SKIP_SD    BIT4
 #define STORAGE_SPI_NAND            (BIT4|BIT0)

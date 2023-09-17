@@ -2907,13 +2907,7 @@ int mmc_start_init(struct mmc *mmc)
 		return -ENOMEDIUM;
 	}
 
-<<<<<<< HEAD
 	err = mmc_get_op_cond(mmc, false);
-=======
-	printf("Getting op cond\n");
-	err = mmc_get_op_cond(mmc);
-	printf("Got op cond\n");
->>>>>>> Sigmastar Uboot Changes
 
 	if (!err)
 		mmc->init_in_progress = 1;

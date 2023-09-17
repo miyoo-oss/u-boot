@@ -578,12 +578,6 @@ static int do_mmc_dev(struct cmd_tbl *cmdtp, int flag,
 		return CMD_RET_USAGE;
 	}
 
-<<<<<<< HEAD
-=======
-    //mmc = init_mmc_device(dev, IS_SD(mmc)? true: false);
-    mmc = init_mmc_device(dev, false);
-
->>>>>>> Sigmastar Uboot Changes
 	if (!mmc)
 		return CMD_RET_FAILURE;
 
