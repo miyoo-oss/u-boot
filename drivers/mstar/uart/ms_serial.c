@@ -27,6 +27,7 @@
 #include <linux/compiler.h>
 #include <serial.h>
 #include <watchdog.h>
+#include <asm/global_data.h>
 
 extern U32 ms_uart_padmux(U8 u8_Port);
 DECLARE_GLOBAL_DATA_PTR;

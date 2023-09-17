@@ -5052,13 +5052,12 @@
 #define MACH_TYPE_OMAP3_MRC3D          5114
 #define MACH_TYPE_CEDRIC               5115
 #define MACH_TYPE_CHICAGO              5116
-#define MACH_TYPE_LITTLETON            5117
-#define MACH_TYPE_INFINITY             5118
-#define MACH_TYPE_INFINITY3            5119
-#define MACH_TYPE_INFINITY2            5120
-#define MACH_TYPE_INFINITY5            5121
-#define MACH_TYPE_INFINITY6            5122
-#define MACH_TYPE_INFINITY2M           5123
-#define MACH_TYPE_INFINITY6E           5124
-#define MACH_TYPE_INFINITY6B0          5125
+#define MACH_TYPE_INFINITY             5117
+#define MACH_TYPE_INFINITY3            5118
+#define MACH_TYPE_INFINITY2            5119
+#define MACH_TYPE_INFINITY5            5120
+#define MACH_TYPE_INFINITY6            5121
+#define MACH_TYPE_INFINITY2M           5122
+#define MACH_TYPE_INFINITY6E           5123
+#define MACH_TYPE_INFINITY6B0          5124
 #endif

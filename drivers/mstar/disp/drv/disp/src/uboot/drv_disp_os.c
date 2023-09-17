@@ -18,6 +18,7 @@ rights to any and all damages, losses, costs and expenses resulting therefrom.
 #include <config.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <linux/delay.h>
 
 #include "drv_disp_os.h"
 //-------------------------------------------------------------------------------------------------

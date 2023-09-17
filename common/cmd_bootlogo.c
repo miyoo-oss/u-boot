@@ -10,6 +10,7 @@
 #include "asm/arch/mach/ms_types.h"
 #include "asm/arch/mach/platform.h"
 #include "asm/arch/mach/io.h"
+#include <cpu_func.h>
 
 #include <ubi_uboot.h>
 #include <cmd_osd.h>

@@ -94,7 +94,7 @@ int mxp_get_env(ulong* offset, int* size)
     }
 
 
-	printf("env_offset=0x%X env_size=0x%X\n", *offset, *size);
+	printf("env_offset=0x%lX env_size=0x%X\n", *offset, *size);
 
 	return 0;
 

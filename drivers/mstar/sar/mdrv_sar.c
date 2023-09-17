@@ -18,6 +18,7 @@
 #include "MsTypes.h"
 #include <common.h>
 #include "mdrv_sar.h"
+#include <linux/delay.h>
 
 #define BOOL    MS_BOOL
 

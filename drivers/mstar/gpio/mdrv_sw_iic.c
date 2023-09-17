@@ -19,6 +19,7 @@
 #include <common.h>
 #include <command.h>
 #include <MsDebug.h>
+#include <linux/delay.h>
 
 #include "drvGPIO.h"
 #include "mhal_gpio.h"

@@ -21,6 +21,7 @@
 #include <spi.h>
 #include "../../gpio/infinity2m/padmux.h"
 #include "../../gpio/drvGPIO.h"
+#include <cpu_func.h>
 
 
 /*-------------------------------------------------------------------------------------------------

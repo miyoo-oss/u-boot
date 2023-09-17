@@ -65,7 +65,10 @@
 #define BASE_REG_PWM_PA         RIU_BASE_ADDR+(PWM_BANK_ADDR*2)
 
 #define BITS_PER_LONG           32
+
+#ifndef GENMASK
 #define GENMASK(h, l)           (((~0UL) - (1UL << (l)) + 1) & (~0UL >> (BITS_PER_LONG - 1 - (h))))
+#endif
 
 #define BASE_REG_NULL 0xFFFFFFFF
 //------------------------------------------------------------------------------

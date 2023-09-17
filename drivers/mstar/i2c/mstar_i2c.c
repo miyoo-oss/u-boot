@@ -2565,7 +2565,7 @@ static int msI2CInit = false;
 /*-----------------------------------------------------------------------
  * Initialization
  */
-static void ms_i2c_init()
+static void ms_i2c_init(void)
 {
     //UartSendTrace("[%s] adap->hwadapnr = %x, speed = %d, slaveaddr = %x \n", __func__, adap->hwadapnr, speed, slaveaddr);
 	if(msI2CInit == false)
@@ -2701,8 +2701,6 @@ static int ms_i2c_set_bus_speed(struct udevice *dev, unsigned int speed)
 static int mstar_i2c_probe(struct udevice *dev)
 {
 	struct i2c_bus *i2c_bus = dev_get_priv(dev);
-	int ret;
-	bool is_dvc;
 
     i2c_bus->port_num = 1;
 
@@ -2719,7 +2717,6 @@ static int ms_i2c_xfer(struct udevice *bus, struct i2c_msg *msg,
 
 	debug("i2c_xfer: %d messages\n", nmsgs);
 	for (; nmsgs > 0; nmsgs--, msg++) {
-		bool next_is_read = nmsgs > 1 && (msg[1].flags & I2C_M_RD);
 
 		debug("i2c_xfer: chip=0x%x, len=0x%x\n", msg->addr, msg->len);
 		if (msg->flags & I2C_M_RD) {
