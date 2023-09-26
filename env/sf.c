@@ -76,7 +76,7 @@ int mxp_get_env(ulong* offset, ulong* redund_offset, int* size)
         {
             *offset = rec.start;
             *size = rec.size / 2;
-			*redund_offset = rec.start + size;
+			*redund_offset = rec.start + *size;
         }
         else
         {
@@ -137,7 +137,7 @@ static int env_sf_save(void)
 	u32	saved_size = 0, saved_offset = 0, sector;
 	u32	sect_size = CONFIG_ENV_SECT_SIZE;
 	int	ret;
-	int env_size = CONFIG_ENV_SIZE
+	int env_size = CONFIG_ENV_SIZE;
 	struct spi_flash *env_flash;
 
 	ret = setup_flash_device(&env_flash);
@@ -152,16 +152,20 @@ static int env_sf_save(void)
 		return -EIO;
 	env_new.flags	= ENV_REDUND_ACTIVE;
 
-#ifdef CONFIG_MS_PARTITION
-    mxp_get_env(&env_offset, &env_new_offset, &env_size);
-#endif
-
 	if (gd->env_valid == ENV_VALID) {
+#ifdef CONFIG_MS_PARTITION
+    	mxp_get_env(&env_offset, &env_new_offset, &env_size);
+#else
 		env_new_offset = CONFIG_ENV_OFFSET_REDUND;
 		env_offset = CONFIG_ENV_OFFSET;
+#endif
 	} else {
+#ifdef CONFIG_MS_PARTITION
+    	mxp_get_env(&env_new_offset, &env_offset, &env_size);
+#else
 		env_new_offset = CONFIG_ENV_OFFSET;
 		env_offset = CONFIG_ENV_OFFSET_REDUND;
+#endif
 	}
 
 	/* Is the sector larger than the env (i.e. embedded) */
@@ -227,7 +231,7 @@ static int env_sf_load(void)
 	int read1_fail, read2_fail;
 	env_t *tmp_env1, *tmp_env2;
 	struct spi_flash *env_flash;
-	int env_size = CONFIG_ENV_SIZE
+	int env_size = CONFIG_ENV_SIZE;
 
 #ifdef CONFIG_MS_PARTITION
     mxp_get_env(&env_offset, &env_new_offset, &env_size);
@@ -383,7 +387,7 @@ static int env_sf_erase(void)
 	int ret;
 	env_t env;
 	struct spi_flash *env_flash;
-	int env_size = CONFIG_ENV_SIZE
+	int env_size = CONFIG_ENV_SIZE;
 
 	ret = setup_flash_device(&env_flash);
 	if (ret)

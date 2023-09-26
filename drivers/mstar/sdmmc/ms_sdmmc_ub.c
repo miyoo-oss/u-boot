@@ -188,30 +188,20 @@ static void _SetPower(SlotEmType eSlot, PowerEmType ePower)
 
     if(ePower == EV_POWER_OFF) // Power Off
     {
-        printf("Powering off\n");
         Hal_SDMMC_ClkCtrl(eIP, FALSE, 0);
-        printf("CLK Set\n");
         Hal_CARD_PullPADPin(ePAD, EV_PULLDOWN, FALSE);
-        printf("PadPinS et\n");
         Hal_CARD_PowerOff(ePAD, WT_POWEROFF); //For SD PAD
-        printf("Power off\n");
 
     }
     else if(ePower == EV_POWER_UP)  // Power Up
     {
-        printf("Powering up\n");
         Hal_CARD_PullPADPin(ePAD, EV_PULLUP, FALSE);
-        printf("PadPinSet\n");
         Hal_CARD_PowerOn(ePAD, WT_POWERUP);
-        printf("Power up\n");
     }
     else if(ePower == EV_POWER_ON) // Power On
     {
-        printf("Powering on\n");
         Hal_SDMMC_ClkCtrl(eIP, TRUE, WT_POWERON);
-        printf("CLK Set\n");
         Hal_SDMMC_Reset(eIP);
-        printf("Powered on\n");
     }
 }
 
@@ -299,7 +289,7 @@ static int mstar_send_cmd(struct udevice *dev, struct mmc_cmd *cmd, struct mmc_d
     u8CMD = (U8_T)cmd->cmdidx;
     u32Arg = (U32_T)cmd->cmdarg;
 
-    printf("_[sdmmc_%u] CMD_%u (0x%08X)", eSlot, u8CMD, u32Arg);
+    //printf("_[sdmmc_%u] CMD_%u (0x%08X)", eSlot, u8CMD, u32Arg);
 
     Hal_SDMMC_SetCmdToken(eIP, u8CMD, u32Arg);
 
@@ -311,7 +301,7 @@ static int mstar_send_cmd(struct udevice *dev, struct mmc_cmd *cmd, struct mmc_d
         u16BlkSize = (U16_T)data->blocksize;
         u16BlkCnt = (U16_T)data->blocks;
 
-        printf("__(TB: %u)(BSz: %u)", u16BlkCnt, u16BlkSize);
+        //printf("__(TB: %u)(BSz: %u)", u16BlkCnt, u16BlkSize);
 
         if(data->flags & MMC_DATA_READ)
         {
